@@ -1,4 +1,12 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Ensure Node.js uses Google DNS to avoid Windows router querySrv ECONNREFUSED issues
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch (err) {
+  // Fallback gracefully if not permitted in environment
+}
 
 const connectDB = async () => {
   try {
