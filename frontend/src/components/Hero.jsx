@@ -60,12 +60,12 @@ function Hero() {
   const marqueeItems = [
     'ARCHITECTURAL TECH',
     'PRECISION AUDIO',
-    '3D TACTILE OBJECTS',
+    'TACTILE OBJECTS',
     'FREE GLOBAL SHIPPING',
     '24-MONTH WARRANTY',
     'ARCHITECTURAL TECH',
     'PRECISION AUDIO',
-    '3D TACTILE OBJECTS',
+    'TACTILE OBJECTS',
     'FREE GLOBAL SHIPPING',
     '24-MONTH WARRANTY',
   ];
@@ -195,7 +195,7 @@ function Hero() {
 
                   <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full glass-editorial text-[10px] uppercase tracking-widest text-[#F5F3EE]">
                     <Sparkles className="w-3 h-3 text-[#C8A97E]" />
-                    <span>3D Interactive</span>
+                    <span>Featured Object</span>
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
