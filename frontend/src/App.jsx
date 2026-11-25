@@ -16,7 +16,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col font-sans" style={{ backgroundColor: '#050A14', color: '#F0F6FF' }}>
+    <div className="min-h-screen flex flex-col font-sans bg-[#F5F3EE] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] transition-colors duration-300">
       <Navbar />
       <main className="flex-1">
         <Routes>
