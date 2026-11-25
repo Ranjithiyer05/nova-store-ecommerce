@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Search, Menu, X, Sparkles, LogOut, Shield, ChevronDown, Heart } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, X, LogOut, Shield, ChevronDown, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import api from '../services/api';
@@ -83,10 +83,38 @@ function Navbar() {
         <div className="flex items-center justify-between h-16 gap-4">
           
           {/* 1. Brand Logo */}
-          <Link to="/" className="flex items-center gap-2 flex-shrink-0 group">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 group-hover:bg-blue-700 transition">
-              <Sparkles className="w-5 h-5" />
-            </div>
+          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+            {/* Custom NovaStore SVG Logo: Shopping bag + rising nova arc */}
+            <svg
+              width="38"
+              height="38"
+              viewBox="0 0 38 38"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-label="NovaStore logo"
+            >
+              {/* Bag body */}
+              <rect x="6" y="14" width="26" height="19" rx="3.5" fill="#2563EB" />
+              {/* Bag top handles */}
+              <path
+                d="M14 14v-3a5 5 0 0 1 10 0v3"
+                stroke="#2563EB"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                fill="none"
+              />
+              {/* Rising nova arc (N initial mark inside bag) */}
+              <path
+                d="M14 27 L14 20 L19 26 L24 20 L24 27"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+              {/* Small star dot above N */}
+              <circle cx="19" cy="18" r="1.3" fill="white" opacity="0.85" />
+            </svg>
             <span className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-blue-600 transition">
               Nova<span className="text-blue-600">Store</span>
             </span>
