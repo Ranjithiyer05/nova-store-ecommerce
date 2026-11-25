@@ -245,12 +245,12 @@ function Navbar() {
             {/* Wishlist Link Button */}
             <Link
               to="/wishlist"
-              className="relative p-2 text-[#F5F3EE]/70 hover:text-[#C8A97E] hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
+              className="relative p-2 text-[#0B0B0C]/75 dark:text-[#F5F3EE]/70 hover:text-[#8C6D46] dark:hover:text-[#C8A97E] hover:bg-[#0B0B0C]/5 dark:hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
               title="Saved Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlistItems.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-[#C8A97E] text-[#0B0B0C] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#8C6D46] dark:bg-[#C8A97E] text-white dark:text-[#0B0B0C] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
               )}
@@ -259,12 +259,12 @@ function Navbar() {
             {/* Shopping Cart Button */}
             <Link
               to="/cart"
-              className="relative p-2 text-[#F5F3EE]/70 hover:text-[#C8A97E] hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
+              className="relative p-2 text-[#0B0B0C]/75 dark:text-[#F5F3EE]/70 hover:text-[#8C6D46] dark:hover:text-[#C8A97E] hover:bg-[#0B0B0C]/5 dark:hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
               title="Shopping Cart"
             >
               <ShoppingCart className="w-5 h-5" />
               {totalItemCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-[#F5F3EE] text-[#0B0B0C] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#0B0B0C] dark:bg-[#F5F3EE] text-[#F5F3EE] dark:text-[#0B0B0C] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {totalItemCount}
                 </span>
               )}
@@ -273,7 +273,7 @@ function Navbar() {
             {/* Mobile Menu Hamburger Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-full text-[#F5F3EE]/70 hover:bg-[#F5F3EE]/5 transition"
+              className="lg:hidden p-2 rounded-full text-[#0B0B0C]/75 dark:text-[#F5F3EE]/70 hover:bg-[#0B0B0C]/5 dark:hover:bg-[#F5F3EE]/5 transition"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
