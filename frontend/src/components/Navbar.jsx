@@ -79,39 +79,39 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all">
+    <header className="sticky top-0 z-50 bg-[#0B0B0C]/85 backdrop-blur-xl border-b border-[#F5F3EE]/10 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
-          
+
           {/* 1. Brand Logo */}
           <Logo />
 
           {/* 2. Search Bar with Live Auto-complete Preview */}
           <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-md relative">
-            <form 
+            <form
               onSubmit={handleSearchSubmit}
               className="w-full relative flex items-center"
             >
               <input
                 type="text"
-                placeholder="Search products, brands, categories..."
+                placeholder="Search objects, brands, categories..."
                 value={searchQuery}
                 onFocus={() => {
                   if (searchResults.length > 0) setShowResultsDropdown(true);
                 }}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-full py-2 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full bg-[#141416] border border-[#F5F3EE]/15 rounded-full py-2 pl-10 pr-4 text-sm text-[#F5F3EE] placeholder-[#F5F3EE]/35 focus:outline-none focus:border-[#C8A97E]/60 transition"
               />
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none" />
+              <Search className="w-4 h-4 text-[#F5F3EE]/40 absolute left-3.5 pointer-events-none" />
               {isSearching && (
-                <div className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin absolute right-3.5 pointer-events-none" />
+                <div className="w-3.5 h-3.5 border-2 border-[#C8A97E] border-t-transparent rounded-full animate-spin absolute right-3.5 pointer-events-none" />
               )}
             </form>
 
             {/* Auto-complete Results Floating Card */}
             {showResultsDropdown && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 overflow-hidden">
-                <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider flex justify-between">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#141416] rounded-2xl shadow-2xl border border-[#F5F3EE]/15 py-2 z-50 overflow-hidden">
+                <div className="px-3 py-1.5 text-[10px] font-semibold text-[#C8A97E] uppercase tracking-[0.2em] flex justify-between">
                   <span>Instant Results</span>
                   <span>{searchResults.length} found</span>
                 </div>
@@ -120,30 +120,30 @@ function Navbar() {
                     <button
                       key={item._id}
                       onClick={() => handleSelectProduct(item._id)}
-                      className="w-full px-3 py-2 flex items-center gap-3 hover:bg-blue-50/60 transition text-left"
+                      className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[#F5F3EE]/5 transition text-left"
                     >
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-10 h-10 object-cover rounded-lg bg-gray-100 flex-shrink-0"
+                        className="w-10 h-10 object-cover rounded-lg bg-[#1B1B1E] flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-900 truncate">{item.name}</p>
-                        <p className="text-[11px] text-gray-500">{item.brand} • ${item.price.toFixed(2)}</p>
+                        <p className="text-xs font-medium text-[#F5F3EE] truncate">{item.name}</p>
+                        <p className="text-[11px] text-[#F5F3EE]/50">{item.brand} • ${item.price.toFixed(2)}</p>
                       </div>
                     </button>
                   ))
                 ) : (
-                  <div className="px-4 py-3 text-xs text-gray-400 text-center">
-                    No products matching "{searchQuery}"
+                  <div className="px-4 py-3 text-xs text-[#F5F3EE]/40 text-center">
+                    No objects matching "{searchQuery}"
                   </div>
                 )}
-                <div className="border-t border-gray-100 p-2 text-center bg-gray-50/50">
+                <div className="border-t border-[#F5F3EE]/10 p-2 text-center bg-[#0B0B0C]/40">
                   <button
                     onClick={handleSearchSubmit}
-                    className="text-xs font-bold text-blue-600 hover:underline"
+                    className="text-xs font-semibold text-[#C8A97E] hover:underline"
                   >
-                    View all matching products ➔
+                    View all matching objects ➔
                   </button>
                 </div>
               </div>
@@ -151,51 +151,51 @@ function Navbar() {
           </div>
 
           {/* 3. Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-600">
-            <Link to="/" className="hover:text-blue-600 transition">
+          <nav className="hidden lg:flex items-center gap-8 text-xs font-medium uppercase tracking-[0.15em] text-[#F5F3EE]/65">
+            <Link to="/" className="hover:text-[#F5F3EE] transition">
               Home
             </Link>
-            <Link to="/products" className="hover:text-blue-600 transition">
-              Products
+            <Link to="/products" className="hover:text-[#F5F3EE] transition">
+              Catalog
             </Link>
-            <Link to="/categories" className="hover:text-blue-600 transition">
+            <Link to="/categories" className="hover:text-[#F5F3EE] transition">
               Categories
             </Link>
-            <Link to="/deals" className="text-amber-600 font-semibold hover:text-amber-700 transition">
-              Deals 🔥
+            <Link to="/deals" className="text-[#C8A97E] hover:text-[#E5D3B3] transition">
+              Archive
             </Link>
           </nav>
 
-          {/* 4. Action Buttons (User Profile & Cart) */}
-          <div className="flex items-center gap-3">
-            
+          {/* 4. Action Buttons (User Profile, Wishlist & Cart) */}
+          <div className="flex items-center gap-2.5">
+
             {/* User Profile Dropdown or Sign In */}
             {user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold transition"
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-[#141416] hover:bg-[#1C1C1F] border border-[#F5F3EE]/15 text-[#F5F3EE] text-xs font-medium transition"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-xs">
+                  <div className="w-6 h-6 rounded-full bg-[#C8A97E] text-[#0B0B0C] flex items-center justify-center font-bold text-xs uppercase">
                     {user.name.charAt(0)}
                   </div>
-                  <span className="hidden sm:inline font-medium">{user.name.split(' ')[0]}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                  <span className="hidden sm:inline">{user.name.split(' ')[0]}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#F5F3EE]/50" />
                 </button>
 
                 {/* Dropdown Menu */}
                 {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 text-xs">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="font-bold text-gray-900 truncate">{user.name}</p>
-                      <p className="text-[11px] text-gray-400 truncate">{user.email}</p>
+                  <div className="absolute right-0 mt-2 w-52 bg-[#141416] rounded-2xl shadow-2xl border border-[#F5F3EE]/15 py-2 z-50 text-xs">
+                    <div className="px-4 py-2 border-b border-[#F5F3EE]/10">
+                      <p className="font-semibold text-[#F5F3EE] truncate">{user.name}</p>
+                      <p className="text-[11px] text-[#F5F3EE]/45 truncate">{user.email}</p>
                     </div>
 
                     {user.isAdmin && (
                       <Link
                         to="/admin"
                         onClick={() => setIsUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-indigo-600 font-bold hover:bg-indigo-50 transition"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-[#C8A97E] font-semibold hover:bg-[#F5F3EE]/5 transition"
                       >
                         <Shield className="w-4 h-4" />
                         <span>Admin Dashboard</span>
@@ -205,14 +205,14 @@ function Navbar() {
                     <Link
                       to="/orders"
                       onClick={() => setIsUserDropdownOpen(false)}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition"
+                      className="block px-4 py-2 text-[#F5F3EE]/75 hover:bg-[#F5F3EE]/5 transition"
                     >
                       My Orders
                     </Link>
 
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left flex items-center gap-2.5 px-4 py-2 text-rose-600 hover:bg-rose-50 transition font-medium border-t border-gray-100 mt-1"
+                      className="w-full text-left flex items-center gap-2.5 px-4 py-2 text-rose-400 hover:bg-rose-500/10 transition font-medium border-t border-[#F5F3EE]/10 mt-1"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Sign Out</span>
@@ -223,9 +223,9 @@ function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition text-xs font-semibold shadow-xs"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#F5F3EE] text-[#0B0B0C] hover:bg-[#C8A97E] transition text-xs font-semibold uppercase tracking-wider"
               >
-                <User className="w-4 h-4" />
+                <User className="w-3.5 h-3.5" />
                 <span>Sign In</span>
               </Link>
             )}
@@ -233,12 +233,12 @@ function Navbar() {
             {/* Wishlist Link Button */}
             <Link
               to="/wishlist"
-              className="relative p-2 text-gray-700 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition flex items-center justify-center"
+              className="relative p-2 text-[#F5F3EE]/70 hover:text-[#C8A97E] hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
               title="Saved Wishlist"
             >
               <Heart className="w-5 h-5" />
               {wishlistItems.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-md">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#C8A97E] text-[#0B0B0C] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
               )}
@@ -247,12 +247,12 @@ function Navbar() {
             {/* Shopping Cart Button */}
             <Link
               to="/cart"
-              className="relative p-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition flex items-center justify-center"
+              className="relative p-2 text-[#F5F3EE]/70 hover:text-[#C8A97E] hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
               title="Shopping Cart"
             >
               <ShoppingCart className="w-5 h-5" />
               {totalItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md animate-pulse">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#F5F3EE] text-[#0B0B0C] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                   {totalItemCount}
                 </span>
               )}
@@ -261,10 +261,10 @@ function Navbar() {
             {/* Mobile Menu Hamburger Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+              className="lg:hidden p-2 rounded-full text-[#F5F3EE]/70 hover:bg-[#F5F3EE]/5 transition"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -274,63 +274,47 @@ function Navbar() {
           <form onSubmit={handleSearchSubmit} className="relative">
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search objects..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-full py-2 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+              className="w-full bg-[#141416] border border-[#F5F3EE]/15 rounded-full py-2 pl-10 pr-4 text-sm text-[#F5F3EE] placeholder-[#F5F3EE]/35 focus:outline-none focus:border-[#C8A97E]/60 transition"
             />
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-2.5 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#F5F3EE]/40 absolute left-3.5 top-2.5 pointer-events-none" />
           </form>
         </div>
       </div>
 
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-100 bg-white px-4 pt-3 pb-6 space-y-3">
+        <div className="lg:hidden border-t border-[#F5F3EE]/10 bg-[#0B0B0C] px-4 pt-3 pb-6 space-y-3">
           <Link
             to="/"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-gray-700 hover:text-blue-600"
+            className="block py-2 text-sm uppercase tracking-wider font-medium text-[#F5F3EE]/80 hover:text-[#C8A97E]"
           >
             Home
           </Link>
           <Link
             to="/products"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-gray-700 hover:text-blue-600"
+            className="block py-2 text-sm uppercase tracking-wider font-medium text-[#F5F3EE]/80 hover:text-[#C8A97E]"
           >
-            Products
+            Catalog
           </Link>
           <Link
             to="/categories"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-gray-700 hover:text-blue-600"
+            className="block py-2 text-sm uppercase tracking-wider font-medium text-[#F5F3EE]/80 hover:text-[#C8A97E]"
           >
             Categories
           </Link>
-          <div className="pt-3 border-t border-gray-100">
-            {user ? (
-              <div className="space-y-2">
-                <p className="text-xs text-gray-500">Signed in as <strong className="text-gray-900">{user.email}</strong></p>
-                <button
-                  onClick={handleLogout}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-rose-50 text-rose-600 font-semibold py-2.5 rounded-lg"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white font-medium py-2.5 rounded-lg shadow-sm"
-              >
-                <User className="w-4 h-4" />
-                Sign In / Register
-              </Link>
-            )}
-          </div>
+          <Link
+            to="/deals"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="block py-2 text-sm uppercase tracking-wider font-medium text-[#C8A97E]"
+          >
+            Archive
+          </Link>
         </div>
       )}
     </header>
