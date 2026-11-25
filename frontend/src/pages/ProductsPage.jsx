@@ -69,27 +69,25 @@ function ProductsPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
+    <div className="min-h-screen bg-[#F5F3EE] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] py-10 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header Banner */}
-        <div className="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-3xl p-8 sm:p-12 text-white mb-8 shadow-xl shadow-blue-900/10 relative overflow-hidden">
-          <div className="relative z-10 max-w-2xl">
-            <span className="inline-block bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">
-              Explore Our Live Catalog
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              All Products & Tech Gadgets
-            </h1>
-            <p className="text-blue-100 text-sm sm:text-base mt-2 leading-relaxed">
-              Find premium wireless audio, smart wearables, laptops, and lifestyle accessories powered by MongoDB.
-            </p>
+        {/* Editorial Gallery Header */}
+        <div className="pb-8 mb-8 border-b border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10">
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[#8C6D46] dark:text-[#C8A97E] font-semibold mb-3">
+            <span className="w-8 h-[1px] bg-[#8C6D46] dark:bg-[#C8A97E]" />
+            <span>Curated Archive / Live Catalog</span>
           </div>
-          <div className="absolute right-0 bottom-0 translate-x-12 translate-y-12 w-80 h-80 bg-white/5 rounded-full pointer-events-none" />
+          <h1 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
+            All Objects & Tech
+          </h1>
+          <p className="text-sm text-[#0B0B0C]/60 dark:text-[#F5F3EE]/55 mt-2 max-w-xl font-light">
+            Explore architectural audio, precision wearables, and minimalist workspace essentials.
+          </p>
         </div>
 
         {/* Search & Action Bar */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-[#EAE5DC]/60 dark:bg-[#141416] rounded-2xl p-4 border border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Live Search Input */}
           <div className="relative w-full md:max-w-md">
@@ -144,16 +142,16 @@ function ProductsPage() {
           
           {/* Left Sidebar Filters */}
           <aside className={`md:col-span-3 ${isMobileFilterOpen ? 'block' : 'hidden md:block'}`}>
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-6 sticky top-24">
+            <div className="bg-[#EAE5DC]/60 dark:bg-[#141416] rounded-2xl p-6 border border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 space-y-6 sticky top-24">
               
-              <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                <div className="flex items-center gap-2 font-bold text-gray-900 text-sm">
-                  <SlidersHorizontal className="w-4 h-4 text-blue-600" />
-                  <span>Filter Products</span>
+              <div className="flex items-center justify-between pb-4 border-b border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10">
+                <div className="flex items-center gap-2 font-semibold text-sm">
+                  <SlidersHorizontal className="w-4 h-4 text-[#8C6D46] dark:text-[#C8A97E]" />
+                  <span>Filter Objects</span>
                 </div>
                 <button
                   onClick={handleResetFilters}
-                  className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-semibold"
+                  className="text-xs text-[#8C6D46] dark:text-[#C8A97E] hover:underline flex items-center gap-1 font-medium"
                 >
                   <RotateCcw className="w-3 h-3" />
                   <span>Reset</span>
@@ -162,16 +160,16 @@ function ProductsPage() {
 
               {/* Category Filter */}
               <div>
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">
+                <h4 className="text-[11px] font-semibold text-[#0B0B0C]/55 dark:text-[#F5F3EE]/55 uppercase tracking-[0.2em] mb-3">
                   Categories
                 </h4>
                 <div className="space-y-1.5 text-xs">
                   <button
                     onClick={() => setSelectedCategory('all')}
-                    className={`w-full text-left px-3 py-2 rounded-lg font-medium transition ${
+                    className={`w-full text-left px-3 py-2 rounded-xl font-medium transition ${
                       selectedCategory === 'all'
-                        ? 'bg-blue-50 text-blue-600 font-bold'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'bg-[#0B0B0C] dark:bg-[#F5F3EE] text-[#F5F3EE] dark:text-[#0B0B0C]'
+                        : 'text-[#0B0B0C]/70 dark:text-[#F5F3EE]/70 hover:bg-[#0B0B0C]/5 dark:hover:bg-[#F5F3EE]/5'
                     }`}
                   >
                     All Categories
