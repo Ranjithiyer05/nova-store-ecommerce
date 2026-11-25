@@ -160,9 +160,6 @@ function Navbar() {
             <Link to="/products" className="hover:text-[#0B0B0C] dark:hover:text-[#F5F3EE] transition">
               Catalog
             </Link>
-            <Link to="/categories" className="hover:text-[#0B0B0C] dark:hover:text-[#F5F3EE] transition">
-              Categories
-            </Link>
             <Link to="/deals" className="text-[#8C6D46] dark:text-[#C8A97E] hover:opacity-80 transition">
               Archive
             </Link>
@@ -312,13 +309,6 @@ function Navbar() {
             className="block py-2 text-sm uppercase tracking-wider font-medium text-[#F5F3EE]/80 hover:text-[#C8A97E]"
           >
             Catalog
-          </Link>
-          <Link
-            to="/categories"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block py-2 text-sm uppercase tracking-wider font-medium text-[#F5F3EE]/80 hover:text-[#C8A97E]"
-          >
-            Categories
           </Link>
           <Link
             to="/deals"
