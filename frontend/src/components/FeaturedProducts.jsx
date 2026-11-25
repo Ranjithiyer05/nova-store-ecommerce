@@ -35,29 +35,29 @@ function FeaturedProducts() {
   });
 
   return (
-    <section className="py-20 bg-[#0B0B0C] text-[#F5F3EE]">
+    <section className="py-20 bg-[#EAE5DC] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header & Tab Controls */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4 pb-6 border-b border-[#F5F3EE]/10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4 pb-6 border-b border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10">
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#C8A97E] flex items-center gap-2">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#8C6D46] dark:text-[#C8A97E] flex items-center gap-2">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Exhibition / Live Catalog</span>
             </span>
-            <h2 className="font-serif-editorial text-3xl sm:text-4xl font-normal tracking-tight mt-2 text-[#F5F3EE]">
+            <h2 className="font-serif-editorial text-3xl sm:text-4xl font-normal tracking-tight mt-2 text-[#0B0B0C] dark:text-[#F5F3EE]">
               Trending & Best Sellers
             </h2>
           </div>
 
           {/* Interactive Filter Pills */}
-          <div className="flex items-center gap-2 p-1 rounded-full bg-[#141416] border border-[#F5F3EE]/10 self-start md:self-auto">
+          <div className="flex items-center gap-2 p-1 rounded-full bg-[#F5F3EE] dark:bg-[#141416] border border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 self-start md:self-auto">
             <button
               onClick={() => setActiveTab('all')}
               className={`px-4 py-2 rounded-full text-xs font-medium transition ${
                 activeTab === 'all'
-                  ? 'bg-[#F5F3EE] text-[#0B0B0C]'
-                  : 'text-[#F5F3EE]/60 hover:text-[#F5F3EE]'
+                  ? 'bg-[#0B0B0C] dark:bg-[#F5F3EE] text-[#F5F3EE] dark:text-[#0B0B0C]'
+                  : 'text-[#0B0B0C]/60 dark:text-[#F5F3EE]/60 hover:text-[#0B0B0C] dark:hover:text-[#F5F3EE]'
               }`}
             >
               All ({products.length})
@@ -66,8 +66,8 @@ function FeaturedProducts() {
               onClick={() => setActiveTab('featured')}
               className={`px-4 py-2 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${
                 activeTab === 'featured'
-                  ? 'bg-[#F5F3EE] text-[#0B0B0C]'
-                  : 'text-[#F5F3EE]/60 hover:text-[#F5F3EE]'
+                  ? 'bg-[#0B0B0C] dark:bg-[#F5F3EE] text-[#F5F3EE] dark:text-[#0B0B0C]'
+                  : 'text-[#0B0B0C]/60 dark:text-[#F5F3EE]/60 hover:text-[#0B0B0C] dark:hover:text-[#F5F3EE]'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -77,8 +77,8 @@ function FeaturedProducts() {
               onClick={() => setActiveTab('bestseller')}
               className={`px-4 py-2 rounded-full text-xs font-medium transition flex items-center gap-1.5 ${
                 activeTab === 'bestseller'
-                  ? 'bg-[#F5F3EE] text-[#0B0B0C]'
-                  : 'text-[#F5F3EE]/60 hover:text-[#F5F3EE]'
+                  ? 'bg-[#0B0B0C] dark:bg-[#F5F3EE] text-[#F5F3EE] dark:text-[#0B0B0C]'
+                  : 'text-[#0B0B0C]/60 dark:text-[#F5F3EE]/60 hover:text-[#0B0B0C] dark:hover:text-[#F5F3EE]'
               }`}
             >
               <Flame className="w-3.5 h-3.5" />

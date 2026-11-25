@@ -32,13 +32,13 @@ function Hero() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[#0B0B0C] text-[#F5F3EE]">
+    <section className="relative overflow-hidden bg-[#F5F3EE] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] transition-colors duration-300">
       {/* Subtle architectural hairline grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            'linear-gradient(to right, #F5F3EE 1px, transparent 1px), linear-gradient(to bottom, #F5F3EE 1px, transparent 1px)',
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
           backgroundSize: '80px 80px',
         }}
       />
@@ -59,14 +59,14 @@ function Hero() {
               <span>Collection 01 / Curated Essentials</span>
             </div>
 
-            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.04] text-[#F5F3EE]">
+            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.04] text-[#0B0B0C] dark:text-[#F5F3EE]">
               Objects of{' '}
               <span className="italic text-gold-gradient">quiet</span>
               <br />
               precision.
             </h1>
 
-            <p className="text-sm sm:text-base leading-relaxed max-w-md text-[#F5F3EE]/60 font-light">
+            <p className="text-sm sm:text-base leading-relaxed max-w-md text-[#0B0B0C]/65 dark:text-[#F5F3EE]/60 font-light">
               A curated storefront of architectural audio, tactile workspaces, and enduring everyday technology—designed to elevate your environment.
             </p>
 
@@ -74,7 +74,7 @@ function Hero() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 to="/products"
-                className="group inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#F5F3EE] text-[#0B0B0C] text-xs font-semibold uppercase tracking-[0.15em] hover:bg-[#C8A97E] transition-all duration-300"
+                className="group inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#0B0B0C] dark:bg-[#F5F3EE] text-[#F5F3EE] dark:text-[#0B0B0C] text-xs font-semibold uppercase tracking-[0.15em] hover:bg-[#8C6D46] dark:hover:bg-[#C8A97E] transition-all duration-300"
               >
                 <span>Explore Catalog</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -82,7 +82,7 @@ function Hero() {
 
               <Link
                 to="/deals"
-                className="group inline-flex items-center gap-2 px-7 py-4 rounded-full border border-[#F5F3EE]/20 text-[#F5F3EE] text-xs font-semibold uppercase tracking-[0.15em] hover:border-[#C8A97E] hover:text-[#C8A97E] transition-all duration-300"
+                className="group inline-flex items-center gap-2 px-7 py-4 rounded-full border border-[#0B0B0C]/20 dark:border-[#F5F3EE]/20 text-[#0B0B0C] dark:text-[#F5F3EE] text-xs font-semibold uppercase tracking-[0.15em] hover:border-[#8C6D46] dark:hover:border-[#C8A97E] hover:text-[#8C6D46] dark:hover:text-[#C8A97E] transition-all duration-300"
               >
                 <span>Seasonal Archive</span>
                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -90,18 +90,18 @@ function Hero() {
             </div>
 
             {/* Minimalist Specs Row */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-[#F5F3EE]/10 max-w-md">
+            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 max-w-md">
               <div>
-                <p className="font-serif-editorial text-2xl text-[#F5F3EE]">4.9</p>
-                <p className="text-[11px] uppercase tracking-wider text-[#F5F3EE]/45 mt-0.5">Client Rating</p>
+                <p className="font-serif-editorial text-2xl text-[#0B0B0C] dark:text-[#F5F3EE]">4.9</p>
+                <p className="text-[11px] uppercase tracking-wider text-[#0B0B0C]/50 dark:text-[#F5F3EE]/45 mt-0.5">Client Rating</p>
               </div>
               <div>
-                <p className="font-serif-editorial text-2xl text-[#F5F3EE]">12k+</p>
-                <p className="text-[11px] uppercase tracking-wider text-[#F5F3EE]/45 mt-0.5">Objects Shipped</p>
+                <p className="font-serif-editorial text-2xl text-[#0B0B0C] dark:text-[#F5F3EE]">12k+</p>
+                <p className="text-[11px] uppercase tracking-wider text-[#0B0B0C]/50 dark:text-[#F5F3EE]/45 mt-0.5">Objects Shipped</p>
               </div>
               <div>
-                <p className="font-serif-editorial text-2xl text-[#F5F3EE]">24m</p>
-                <p className="text-[11px] uppercase tracking-wider text-[#F5F3EE]/45 mt-0.5">Global Warranty</p>
+                <p className="font-serif-editorial text-2xl text-[#0B0B0C] dark:text-[#F5F3EE]">24m</p>
+                <p className="text-[11px] uppercase tracking-wider text-[#0B0B0C]/50 dark:text-[#F5F3EE]/45 mt-0.5">Global Warranty</p>
               </div>
             </div>
           </div>
