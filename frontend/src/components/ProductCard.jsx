@@ -13,9 +13,8 @@ function ProductCard({ product }) {
     : 0;
 
   const handleAddToCart = (e) => {
-    e.preventDefault(); // Prevents clicking the link to the product details page
+    e.preventDefault();
     if (product.countInStock === 0) return;
-
     addToCart(product, 1);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1800);
@@ -27,10 +26,17 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 flex flex-col overflow-hidden">
-      
-      {/* 1. Image Container */}
-      <Link to={`/product/${product._id}`} className="relative block aspect-square bg-gray-50 overflow-hidden">
+    <div
+      className="group relative flex flex-col overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1"
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        backdropFilter: 'blur(16px)',
+      }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 40px rgba(59,130,246,0.2), 0 20px 40px rgba(0,0,0,0.4)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+    >
+      <Link to={`/product/${product._id}`} className="relative block aspect-square overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
         <img
           src={product.image}
           alt={product.name}
@@ -38,21 +44,20 @@ function ProductCard({ product }) {
           loading="lazy"
         />
 
-        {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
           {product.countInStock === 0 ? (
-            <span className="bg-gray-900/90 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
+            <span className="text-[11px] font-bold px-2.5 py-1 rounded-md" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', color: 'rgba(240,246,255,0.7)' }}>
               Out of Stock
             </span>
           ) : (
             <>
               {product.isBestSeller && (
-                <span className="bg-amber-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-md shadow-sm">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-md text-white" style={{ background: 'linear-gradient(135deg, #F59E0B, #EF4444)' }}>
                   Bestseller
                 </span>
               )}
               {discountPercent > 0 && (
-                <span className="bg-rose-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-md text-white" style={{ background: 'linear-gradient(135deg, #EF4444, #F97316)' }}>
                   -{discountPercent}%
                 </span>
               )}
@@ -60,75 +65,58 @@ function ProductCard({ product }) {
           )}
         </div>
 
-        {/* Wishlist Heart Button */}
         <button
           onClick={handleToggleWishlist}
           aria-label="Save to Wishlist"
-          className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-gray-400 hover:text-rose-500 hover:bg-white shadow-sm transition transform active:scale-90"
+          className="absolute top-3 right-3 p-2 rounded-full transition transform active:scale-90"
+          style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
-          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-500 text-rose-500' : ''}`} />
+          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-400 text-rose-400' : 'text-white/60 hover:text-rose-400'}`} />
         </button>
       </Link>
 
-      {/* 2. Product Information */}
       <div className="p-4 flex flex-col flex-1">
-        {/* Category & Brand */}
-        <div className="flex items-center justify-between text-xs text-gray-400 font-medium mb-1.5">
+        <div className="flex items-center justify-between text-xs mb-1.5" style={{ color: 'rgba(240,246,255,0.4)' }}>
           <span>{product.categoryName || product.category}</span>
-          <span className="text-gray-500 font-semibold">{product.brand}</span>
+          <span className="font-semibold" style={{ color: 'rgba(240,246,255,0.6)' }}>{product.brand}</span>
         </div>
 
-        {/* Title */}
-        <Link to={`/product/${product._id}`} className="block flex-1 group-hover:text-blue-600 transition">
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug">
-            {product.name}
-          </h3>
+        <Link to={`/product/${product._id}`} className="font-semibold text-sm text-white hover:text-blue-400 transition line-clamp-2 leading-snug mb-2">
+          {product.name}
         </Link>
 
-        {/* Star Rating */}
-        <div className="flex items-center gap-1.5 my-2.5">
-          <div className="flex items-center text-amber-400">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+        <div className="flex items-center gap-1.5 mb-3">
+          <div className="flex">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className={`w-3 h-3 ${i < Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-white/15'}`} />
+            ))}
           </div>
-          <span className="text-xs font-bold text-gray-900">{product.rating}</span>
-          <span className="text-xs text-gray-400">({product.numReviews})</span>
+          <span className="text-[11px]" style={{ color: 'rgba(240,246,255,0.4)' }}>({product.numReviews})</span>
         </div>
 
-        {/* Pricing and Action Button */}
-        <div className="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+        <div className="mt-auto flex items-center justify-between gap-2">
           <div>
-            <span className="text-lg font-bold text-gray-900">
+            <span className="text-lg font-black gradient-text">
               ${product.price.toFixed(2)}
             </span>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="block text-xs text-gray-400 line-through">
-                ${product.originalPrice.toFixed(2)}
-              </span>
+            {product.originalPrice > product.price && (
+              <span className="text-xs line-through ml-1.5" style={{ color: 'rgba(240,246,255,0.3)' }}>${product.originalPrice.toFixed(2)}</span>
             )}
           </div>
 
           <button
             onClick={handleAddToCart}
             disabled={product.countInStock === 0}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition duration-200 ${
-              product.countInStock === 0
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : isAdded
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 active:scale-95'
-            }`}
+            className="p-2.5 rounded-xl transition-all duration-200 disabled:opacity-30"
+            style={isAdded
+              ? { background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)' }
+              : { background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.25)' }
+            }
           >
-            {isAdded ? (
-              <>
-                <Check className="w-3.5 h-3.5" />
-                <span>Added</span>
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-3.5 h-3.5" />
-                <span>{product.countInStock === 0 ? 'Sold Out' : 'Add'}</span>
-              </>
-            )}
+            {isAdded
+              ? <Check className="w-4 h-4 text-emerald-400" />
+              : <ShoppingCart className="w-4 h-4 text-blue-400" />
+            }
           </button>
         </div>
       </div>

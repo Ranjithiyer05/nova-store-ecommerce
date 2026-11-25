@@ -107,8 +107,8 @@ function Logo({ className = '' }) {
       </svg>
 
       {/* Wordmark */}
-      <span className="text-xl font-extrabold tracking-tight text-gray-900 group-hover:text-blue-600 transition leading-none">
-        Nova<span className="text-blue-600">Store</span>
+      <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-blue-400 transition leading-none">
+        Nova<span className="gradient-text">Store</span>
       </span>
     </Link>
   );
