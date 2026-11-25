@@ -6,7 +6,17 @@ import { useCart } from '../context/CartContext';
 function ProductCard({ product }) {
   const { addToCart, toggleWishlist, isInWishlist } = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const isWishlisted = isInWishlist(product._id);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
+    setTilt({ x, y });
+  };
+
+  const handleMouseLeave = () => setTilt({ x: 0, y: 0 });
 
   const discountPercent =
     product.originalPrice && product.originalPrice > product.price
@@ -27,7 +37,14 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#F5F3EE] dark:bg-[#141416] border border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 hover:border-[#8C6D46]/50 dark:hover:border-[#C8A97E]/40 transition-all duration-500 hover:-translate-y-1.5">
+    <div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: `perspective(900px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+      }}
+      className="group relative flex flex-col overflow-hidden rounded-2xl bg-[#F5F3EE] dark:bg-[#141416] border border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 hover:border-[#8C6D46]/60 dark:hover:border-[#C8A97E]/50 hover:shadow-2xl transition-all duration-200 ease-out"
+    >
       {/* Image Frame */}
       <Link to={`/product/${product._id}`} className="relative block aspect-square overflow-hidden bg-[#EAE5DC] dark:bg-[#1B1B1E]">
         <img
