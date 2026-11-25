@@ -1,23 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Search, Menu, X, Sparkles, LogOut, Shield, ChevronDown } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, X, Sparkles, LogOut, Shield, ChevronDown, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import api from '../services/api';
 
 function Navbar() {
   const { user, logout } = useAuth();
-  const { totalItemCount } = useCart();
+  const { totalItemCount, wishlistItems } = useCart();
   const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Live Auto-complete Search States
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResultsDropdown, setShowResultsDropdown] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  // Debounced live search
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setShowResultsDropdown(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        setIsSearching(true);
+        const res = await api.get('/products', {
+          params: { keyword: searchQuery.trim() },
+        });
+        setSearchResults((res.data.products || []).slice(0, 5));
+        setShowResultsDropdown(true);
+      } catch (err) {
+        console.error('Search failed', err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Close search preview on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setShowResultsDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      setShowResultsDropdown(false);
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  const handleSelectProduct = (productId) => {
+    setShowResultsDropdown(false);
+    setSearchQuery('');
+    navigate(`/product/${productId}`);
   };
 
   const handleLogout = () => {
@@ -41,20 +92,69 @@ function Navbar() {
             </span>
           </Link>
 
-          {/* 2. Search Bar */}
-          <form 
-            onSubmit={handleSearchSubmit}
-            className="hidden md:flex flex-1 max-w-md relative items-center"
-          >
-            <input
-              type="text"
-              placeholder="Search products, brands, categories..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-full py-2 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
-            />
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none" />
-          </form>
+          {/* 2. Search Bar with Live Auto-complete Preview */}
+          <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-md relative">
+            <form 
+              onSubmit={handleSearchSubmit}
+              className="w-full relative flex items-center"
+            >
+              <input
+                type="text"
+                placeholder="Search products, brands, categories..."
+                value={searchQuery}
+                onFocus={() => {
+                  if (searchResults.length > 0) setShowResultsDropdown(true);
+                }}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-200 rounded-full py-2 pl-10 pr-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+              />
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 pointer-events-none" />
+              {isSearching && (
+                <div className="w-3.5 h-3.5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin absolute right-3.5 pointer-events-none" />
+              )}
+            </form>
+
+            {/* Auto-complete Results Floating Card */}
+            {showResultsDropdown && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 overflow-hidden">
+                <div className="px-3 py-1.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider flex justify-between">
+                  <span>Instant Results</span>
+                  <span>{searchResults.length} found</span>
+                </div>
+                {searchResults.length > 0 ? (
+                  searchResults.map((item) => (
+                    <button
+                      key={item._id}
+                      onClick={() => handleSelectProduct(item._id)}
+                      className="w-full px-3 py-2 flex items-center gap-3 hover:bg-blue-50/60 transition text-left"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-10 h-10 object-cover rounded-lg bg-gray-100 flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 truncate">{item.name}</p>
+                        <p className="text-[11px] text-gray-500">{item.brand} • ${item.price.toFixed(2)}</p>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-xs text-gray-400 text-center">
+                    No products matching "{searchQuery}"
+                  </div>
+                )}
+                <div className="border-t border-gray-100 p-2 text-center bg-gray-50/50">
+                  <button
+                    onClick={handleSearchSubmit}
+                    className="text-xs font-bold text-blue-600 hover:underline"
+                  >
+                    View all matching products ➔
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* 3. Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-gray-600">
@@ -135,6 +235,20 @@ function Navbar() {
                 <span>Sign In</span>
               </Link>
             )}
+
+            {/* Wishlist Link Button */}
+            <Link
+              to="/wishlist"
+              className="relative p-2 text-gray-700 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition flex items-center justify-center"
+              title="Saved Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+              {wishlistItems.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-md">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </Link>
 
             {/* Shopping Cart Button */}
             <Link

@@ -8,6 +8,7 @@ import ProductDetailsPage from './pages/ProductDetailsPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CartPage from './pages/CartPage';
+import WishlistPage from './pages/WishlistPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import MyOrdersPage from './pages/MyOrdersPage';
@@ -42,8 +43,9 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Shopping Cart & Checkout Routes */}
+          {/* Shopping Cart, Wishlist & Checkout Routes */}
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order/:id" element={<OrderDetailsPage />} />
           <Route path="/orders" element={<MyOrdersPage />} />

@@ -4,9 +4,9 @@ import { Star, ShoppingCart, Heart, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 function ProductCard({ product }) {
-  const { addToCart } = useCart();
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { addToCart, toggleWishlist, isInWishlist } = useCart();
   const [isAdded, setIsAdded] = useState(false);
+  const isWishlisted = isInWishlist(product._id);
 
   const discountPercent = product.originalPrice && product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -23,7 +23,7 @@ function ProductCard({ product }) {
 
   const handleToggleWishlist = (e) => {
     e.preventDefault();
-    setIsWishlisted(!isWishlisted);
+    toggleWishlist(product);
   };
 
   return (

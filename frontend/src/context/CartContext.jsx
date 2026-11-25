@@ -13,6 +13,16 @@ export function CartProvider({ children }) {
     }
   });
 
+  // Initialize wishlist items from localStorage
+  const [wishlistItems, setWishlistItems] = useState(() => {
+    try {
+      const savedWishlist = localStorage.getItem('wishlistItems');
+      return savedWishlist ? JSON.parse(savedWishlist) : [];
+    } catch {
+      return [];
+    }
+  });
+
   // Save to localStorage whenever cartItems changes
   useEffect(() => {
     try {
@@ -21,6 +31,43 @@ export function CartProvider({ children }) {
       console.error('Failed to save cart to localStorage', err);
     }
   }, [cartItems]);
+
+  // Save to localStorage whenever wishlistItems changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('wishlistItems', JSON.stringify(wishlistItems));
+    } catch (err) {
+      console.error('Failed to save wishlist to localStorage', err);
+    }
+  }, [wishlistItems]);
+
+  // Wishlist toggle
+  const toggleWishlist = (product) => {
+    setWishlistItems((prev) => {
+      const exists = prev.find((item) => item._id === product._id);
+      if (exists) {
+        return prev.filter((item) => item._id !== product._id);
+      } else {
+        return [
+          ...prev,
+          {
+            _id: product._id,
+            name: product.name,
+            image: product.image,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            rating: product.rating,
+            countInStock: product.countInStock,
+            category: product.category,
+          },
+        ];
+      }
+    });
+  };
+
+  const isInWishlist = (productId) => {
+    return wishlistItems.some((item) => item._id === productId);
+  };
 
   // 2. Add item to cart
   const addToCart = (product, qty = 1) => {
@@ -114,6 +161,9 @@ export function CartProvider({ children }) {
         shippingPrice,
         taxPrice,
         totalPrice,
+        wishlistItems,
+        toggleWishlist,
+        isInWishlist,
       }}
     >
       {children}
