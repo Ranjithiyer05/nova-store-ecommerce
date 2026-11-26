@@ -52,18 +52,17 @@ export default function CableAnimation() {
           100% { opacity: 0; }
         }
         @keyframes nova-plug-pop {
-          0%   { opacity: 0; transform: scale(0.4); }
-          60%  { opacity: 1; transform: scale(1.15); }
-          80%  { transform: scale(0.95); }
-          100% { opacity: 1; transform: scale(1); }
+          0%   { opacity: 0; }
+          40%  { opacity: 1; }
+          100% { opacity: 1; }
         }
         @keyframes nova-ripple {
-          0%   { r: 6;  opacity: 1; }
-          100% { r: 28; opacity: 0; }
+          0%   { r: 8;  opacity: 1; }
+          100% { r: 32; opacity: 0; }
         }
         @keyframes nova-ripple2 {
-          0%   { r: 6;  opacity: 0.6; }
-          100% { r: 42; opacity: 0; }
+          0%   { r: 8;  opacity: 0.6; }
+          100% { r: 48; opacity: 0; }
         }
       `}</style>
 
@@ -108,45 +107,70 @@ export default function CableAnimation() {
           }}
         />
 
-        {/* ── 3.5mm TRS plug tip (gold dot that appears on contact) ── */}
+        {/* ── 3.5mm TRS steel plug tip ── */}
+        {/* Shaft (steel chrome cylinder look) */}
+        <rect
+          x={anim.endX - 3}
+          y={anim.endY - 18}
+          width="6"
+          height="22"
+          rx="3"
+          fill="#c8c8d0"
+          stroke="#888"
+          strokeWidth="0.6"
+          style={{ animation: 'nova-plug-pop 0.35s ease-out 0.52s both' }}
+        />
+        {/* Gold insulator ring */}
+        <rect
+          x={anim.endX - 3.5}
+          y={anim.endY - 7}
+          width="7"
+          height="4"
+          rx="2"
+          fill="#C8A97E"
+          style={{ animation: 'nova-plug-pop 0.35s ease-out 0.52s both' }}
+        />
+        {/* Black insulator ring */}
+        <rect
+          x={anim.endX - 3}
+          y={anim.endY - 2}
+          width="6"
+          height="3"
+          rx="1.5"
+          fill="#222"
+          style={{ animation: 'nova-plug-pop 0.35s ease-out 0.52s both' }}
+        />
+        {/* Rounded steel tip */}
         <circle
           cx={anim.endX}
-          cy={anim.endY}
-          r="5"
-          fill="#C8A97E"
-          style={{
-            transformOrigin: `${anim.endX}px ${anim.endY}px`,
-            opacity: 0,
-            animation: 'nova-plug-pop 0.35s ease-out 0.52s forwards',
-          }}
+          cy={anim.endY + 4}
+          r="3"
+          fill="#b0b0bc"
+          stroke="#777"
+          strokeWidth="0.5"
+          style={{ animation: 'nova-plug-pop 0.35s ease-out 0.52s both' }}
         />
 
         {/* ── Contact ripple 1 (sharp inner) ── */}
         <circle
           cx={anim.endX}
           cy={anim.endY}
-          r="6"
+          r="8"
           fill="none"
           stroke="#C8A97E"
           strokeWidth="2"
-          style={{
-            opacity: 0,
-            animation: 'nova-ripple 0.5s ease-out 0.56s forwards',
-          }}
+          style={{ animation: 'nova-ripple 0.5s ease-out 0.56s both' }}
         />
 
         {/* ── Contact ripple 2 (wider outer) ── */}
         <circle
           cx={anim.endX}
           cy={anim.endY}
-          r="6"
+          r="8"
           fill="none"
           stroke="#C8A97E"
           strokeWidth="1.5"
-          style={{
-            opacity: 0,
-            animation: 'nova-ripple2 0.65s ease-out 0.65s forwards',
-          }}
+          style={{ animation: 'nova-ripple2 0.65s ease-out 0.65s both' }}
         />
       </svg>
     </>
