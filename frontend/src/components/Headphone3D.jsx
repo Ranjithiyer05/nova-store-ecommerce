@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { useCart } from '../context/CartContext';
 
 function isWebGLAvailable() {
   try {
@@ -13,54 +17,97 @@ function isWebGLAvailable() {
   }
 }
 
-function createLeatherTexture() {
-  const size = 128;
+/**
+ * Generates a fine procedural leather-grain bump map for the ear cushions.
+ */
+function createLeatherBumpTexture() {
+  const size = 256;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
   const imgData = ctx.createImageData(size, size);
   for (let i = 0; i < imgData.data.length; i += 4) {
-    const v = 108 + Math.floor(Math.random() * 40);
-    imgData.data[i] = v;
-    imgData.data[i + 1] = v;
-    imgData.data[i + 2] = v;
+    const n = 115 + Math.floor(Math.random() * 32);
+    imgData.data[i] = n;
+    imgData.data[i + 1] = n;
+    imgData.data[i + 2] = n;
     imgData.data[i + 3] = 255;
   }
   ctx.putImageData(imgData, 0, 0);
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(4, 4);
+  tex.repeat.set(6, 6);
   return tex;
+}
+
+/**
+ * Generates a soft radial contact shadow texture.
+ */
+function createContactShadowTexture() {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 4, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(11, 11, 12, 0.38)');
+  grad.addColorStop(0.55, 'rgba(11, 11, 12, 0.14)');
+  grad.addColorStop(1, 'rgba(11, 11, 12, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  return new THREE.CanvasTexture(canvas);
 }
 
 function HeadphoneStaticFallback() {
   return (
     <svg
-      viewBox="0 0 120 150"
+      viewBox="0 0 120 140"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="w-40 h-48 mx-auto drop-shadow-xl"
+      className="w-full h-full drop-shadow-lg"
       aria-hidden="true"
     >
-      <path d="M24 66C24 36 40 16 60 16C80 16 96 36 96 66" stroke="#18181B" strokeWidth="9" strokeLinecap="round" />
-      <rect x="14" y="64" width="17" height="36" rx="8.5" fill="#141416" stroke="#C8A97E" strokeWidth="1.4" />
-      <rect x="89" y="64" width="17" height="36" rx="8.5" fill="#141416" stroke="#C8A97E" strokeWidth="1.4" />
-      <path d="M22 100C20 118 26 130 22 142" stroke="#141416" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="22" cy="143" r="2.5" fill="#C8A97E" />
+      <path d="M24 66C24 36 40 16 60 16C80 16 96 36 96 66" stroke="#18181B" strokeWidth="8" strokeLinecap="round" />
+      <rect x="14" y="64" width="16" height="34" rx="8" fill="#141416" stroke="#C8A97E" strokeWidth="1.2" />
+      <rect x="90" y="64" width="16" height="34" rx="8" fill="#141416" stroke="#C8A97E" strokeWidth="1.2" />
     </svg>
   );
 }
 
 /**
- * Full-viewport 3D Headphone & Verlet-Physics AUX Cable.
- * - Headphone is anchored to #hero-headphone-anchor in world space.
- * - Dangling 3D TubeGeometry AUX cable + 3.5mm gold/chrome connector hangs under gravity.
- * - On Add-to-Cart (lastAddedEvent), the 3D connector swings across the screen to
- *   physically tap #navbar-cart-icon, triggers a bounce/glow, and returns smoothly.
+ * Triggers a subtle physical bounce + warm gold contact ripple on the Navbar cart button.
  */
-export default function Headphone3D({ lastAddedEvent }) {
+function triggerCartImpact(cartEl) {
+  if (!cartEl) return;
+  cartEl.style.transition = 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease';
+  cartEl.style.transform = 'scale(1.18) translateY(2px)';
+  cartEl.style.boxShadow = '0 0 0 6px rgba(200, 169, 126, 0.28)';
+
+  setTimeout(() => {
+    if (!cartEl) return;
+    cartEl.style.transform = 'scale(0.96)';
+    cartEl.style.boxShadow = '0 0 0 12px rgba(200, 169, 126, 0)';
+  }, 160);
+
+  setTimeout(() => {
+    if (!cartEl) return;
+    cartEl.style.transform = '';
+    cartEl.style.boxShadow = '';
+  }, 340);
+}
+
+/**
+ * Photorealistic GLTF Over-Ear Headphone with Verlet Rope AUX Cable Physics.
+ * - Loads /models/headphones.gltf (Blender-sculpted over-ear asset) with RoomEnvironment PBR reflections.
+ * - Normalizes & hangs the headband directly over #hero-headphone-anchor ('O' in "Objects").
+ * - Simulates a 16-node fixed-length Verlet rubber cable + 3.5mm TRS metal plug under gravity.
+ * - On Add-to-Cart (lastAddedEvent), swings the 3.5mm connector cleanly to #navbar-cart-icon,
+ *   taps it with contact feedback, and settles back under gravity.
+ */
+export default function Headphone3D() {
+  const { lastAddedEvent } = useCart();
   const [webGLSupported] = useState(() => isWebGLAvailable());
   const actionRef = useRef({ active: false, startTime: 0, pulsed: false });
 
@@ -85,9 +132,8 @@ export default function Headphone3D({ lastAddedEvent }) {
     const height = window.innerHeight;
 
     const scene = new THREE.Scene();
-    // Orthographic-like perspective camera at z = 10
-    const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100);
-    camera.position.set(0, 0, 10);
+    const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
+    camera.position.set(0, 0, 12);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -97,7 +143,7 @@ export default function Headphone3D({ lastAddedEvent }) {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.18;
     renderer.domElement.style.position = 'fixed';
     renderer.domElement.style.inset = '0';
     renderer.domElement.style.width = '100vw';
@@ -106,150 +152,199 @@ export default function Headphone3D({ lastAddedEvent }) {
     renderer.domElement.style.zIndex = '55';
     document.body.appendChild(renderer.domElement);
 
-    // Studio Softbox Environment
+    // Photorealistic studio HDRI-style RoomEnvironment reflections
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
-    const envScene = new THREE.Scene();
-    envScene.background = new THREE.Color(0x1a1a1d);
-    const sb1 = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.MeshBasicMaterial({ color: 0xfff5e6 }));
-    sb1.position.set(4, 5, 4);
-    sb1.lookAt(0, 0, 0);
-    envScene.add(sb1);
-    const sb2 = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.MeshBasicMaterial({ color: 0xc8a97e }));
-    sb2.position.set(-5, 2, -3);
-    sb2.lookAt(0, 0, 0);
-    envScene.add(sb2);
-    scene.environment = pmremGenerator.fromScene(envScene, 0.04).texture;
+    const roomEnv = new RoomEnvironment();
+    const envRT = pmremGenerator.fromScene(roomEnv, 0.04);
+    scene.environment = envRT.texture;
+    roomEnv.dispose();
     pmremGenerator.dispose();
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0xf5f3ee, 1.25));
-    const keyLight = new THREE.DirectionalLight(0xfff6e9, 2.5);
-    keyLight.position.set(3.5, 4.5, 5);
+    // Soft studio key + warm champagne rim lighting (makes matte-black pop on both dark & beige themes)
+    scene.add(new THREE.AmbientLight(0xf5f3ee, 1.05));
+    const keyLight = new THREE.DirectionalLight(0xfff7ec, 2.6);
+    keyLight.position.set(4, 6, 6);
     scene.add(keyLight);
-    const rimLight = new THREE.DirectionalLight(0xc8a97e, 1.8);
-    rimLight.position.set(-4, 2, -3);
+    const rimLight = new THREE.DirectionalLight(0xc8a97e, 2.4);
+    rimLight.position.set(-5, 3, -3);
     scene.add(rimLight);
+    const backRim = new THREE.DirectionalLight(0xf5f3ee, 1.5);
+    backRim.position.set(2, -2, -5);
+    scene.add(backRim);
 
-    // Materials
-    const leatherTex = createLeatherTexture();
-    const matteBlack = new THREE.MeshStandardMaterial({
-      color: 0x161619,
-      roughness: 0.56,
-      metalness: 0.25,
-      envMapIntensity: 1.15,
-    });
-    const plushLeather = new THREE.MeshStandardMaterial({
-      color: 0x101013,
-      roughness: 0.84,
-      metalness: 0.05,
-      bumpMap: leatherTex,
-      bumpScale: 0.012,
-    });
-    const champagneGold = new THREE.MeshStandardMaterial({
-      color: 0xc8a97e,
-      roughness: 0.22,
-      metalness: 0.92,
-      envMapIntensity: 1.45,
-    });
-    const darkGunmetal = new THREE.MeshStandardMaterial({
-      color: 0x26262b,
-      roughness: 0.32,
-      metalness: 0.82,
-    });
-    const rubberCableMat = new THREE.MeshStandardMaterial({
-      color: 0x121215,
-      roughness: 0.78,
-      metalness: 0.08,
-    });
+    const leatherBump = createLeatherBumpTexture();
+    const shadowTex = createContactShadowTexture();
 
-    // Headphone Root
+    // Headphone anchor & pivot (pivots right where the headband rests on 'O')
     const pivotGroup = new THREE.Group();
     scene.add(pivotGroup);
 
-    const headphone = new THREE.Group();
-    headphone.position.set(0, -0.92, 0);
-    pivotGroup.add(headphone);
-
-    // Headband
-    const bandMesh = new THREE.Mesh(
-      new THREE.TorusGeometry(0.84, 0.078, 28, 72, Math.PI * 1.05),
-      matteBlack
+    // Subtle contact shadow right behind the headband/earcups
+    const contactShadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.5, 1.5),
+      new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false, opacity: 0.7 })
     );
-    bandMesh.rotation.z = -Math.PI * 0.025;
-    bandMesh.position.y = 0.12;
-    headphone.add(bandMesh);
+    contactShadow.position.set(0.05, -0.55, -0.35);
+    pivotGroup.add(contactShadow);
 
-    const cushionMesh = new THREE.Mesh(
-      new THREE.TorusGeometry(0.77, 0.044, 18, 48, Math.PI * 0.72),
-      plushLeather
-    );
-    cushionMesh.rotation.z = Math.PI * 0.14;
-    cushionMesh.position.y = 0.12;
-    headphone.add(cushionMesh);
+    // Local offset where the AUX cable attaches to the left earcup bottom
+    const localPortOffset = new THREE.Vector3(-0.46, -1.06, 0.08);
+    let modelLoaded = false;
 
-    // Earcups & Sliders
-    [-1, 1].forEach((side) => {
-      const sideGroup = new THREE.Group();
-      sideGroup.position.set(side * 0.84, 0.08, 0);
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+    const loader = new GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
+    loader.load(
+      '/models/headphones.gltf',
+      (gltf) => {
+        const model = gltf.scene;
 
-      const slider = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.28, 18), champagneGold);
-      slider.position.y = -0.14;
-      sideGroup.add(slider);
+        // Upgrade GLTF materials to NovaStore luxury matte-black & champagne-gold PBR
+        model.traverse((child) => {
+          if (!child.isMesh) return;
+          const matName = child.material?.name || '';
 
-      const hinge = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.06, 18), darkGunmetal);
-      hinge.position.y = -0.28;
-      sideGroup.add(hinge);
+          if (matName === 'Cushion') {
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x161618,
+              roughness: 0.82,
+              metalness: 0.04,
+              bumpMap: leatherBump,
+              bumpScale: 0.008,
+              sheen: 0.35,
+              sheenRoughness: 0.7,
+              sheenColor: new THREE.Color(0x2f2b25),
+            });
+          } else if (matName === 'GlowBlue') {
+            // Replace neon blue accent with brushed champagne gold
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xc8a97e,
+              roughness: 0.24,
+              metalness: 0.92,
+              envMapIntensity: 1.5,
+            });
+          } else if (matName === 'Connector') {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x8c6d46,
+              roughness: 0.28,
+              metalness: 0.88,
+            });
+          } else if (matName === 'Black-1') {
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x18181b,
+              roughness: 0.44,
+              metalness: 0.22,
+              clearcoat: 0.14,
+              clearcoatRoughness: 0.42,
+            });
+          } else {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x121215,
+              roughness: 0.6,
+              metalness: 0.16,
+            });
+          }
+        });
 
-      const cupGroup = new THREE.Group();
-      cupGroup.position.set(side * -0.04, -0.56, 0);
-      cupGroup.rotation.z = side * 0.12;
+        // Normalize GLTF scale & pivot so top inner headband sits at (0, 0, 0)
+        const box = new THREE.Box3().setFromObject(model);
+        const size = new THREE.Vector3();
+        const center = new THREE.Vector3();
+        box.getSize(size);
+        box.getCenter(center);
 
-      const shellGeo = new THREE.CylinderGeometry(0.33, 0.35, 0.19, 36);
-      shellGeo.rotateZ(Math.PI / 2);
-      cupGroup.add(new THREE.Mesh(shellGeo, matteBlack));
+        const targetHeight = 1.38;
+        const normScale = targetHeight / (size.y || 1);
+        model.scale.setScalar(normScale);
 
-      const ringGeo = new THREE.TorusGeometry(0.25, 0.013, 14, 36);
-      ringGeo.rotateY(Math.PI / 2);
-      const ring = new THREE.Mesh(ringGeo, champagneGold);
-      ring.position.x = side * 0.096;
-      cupGroup.add(ring);
+        // Recompute bounds after scaling
+        const scaledBox = new THREE.Box3().setFromObject(model);
+        const scaledCenter = new THREE.Vector3();
+        scaledBox.getCenter(scaledCenter);
 
-      const padGeo = new THREE.TorusGeometry(0.27, 0.088, 24, 40);
-      padGeo.rotateY(Math.PI / 2);
-      const pad = new THREE.Mesh(padGeo, plushLeather);
-      pad.position.x = -side * 0.098;
-      cupGroup.add(pad);
+        model.position.x -= scaledCenter.x;
+        model.position.z -= scaledCenter.z;
+        // Hang downward so the top headband arch rests at y = 0
+        model.position.y -= scaledBox.max.y - 0.1;
 
-      if (side === -1) {
-        const jack = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.14, 14), champagneGold);
-        jack.position.set(0, -0.35, 0);
-        cupGroup.add(jack);
+        // Slight 3/4 editorial turn so earcups & gold ring show depth around 'O'
+        const modelWrapper = new THREE.Group();
+        modelWrapper.rotation.y = 0.36;
+        modelWrapper.rotation.z = -0.03;
+        modelWrapper.add(model);
+        pivotGroup.add(modelWrapper);
+
+        // Measure left earcup bottom in wrapper space for exact cable attachment
+        const finalBox = new THREE.Box3().setFromObject(modelWrapper);
+        localPortOffset.set(
+          finalBox.min.x + (finalBox.max.x - finalBox.min.x) * 0.24,
+          finalBox.min.y + 0.14,
+          0.06
+        );
+        modelLoaded = true;
+      },
+      undefined,
+      (err) => {
+        console.error('Failed to load headphones.gltf', err);
       }
+    );
 
-      sideGroup.add(cupGroup);
-      headphone.add(sideGroup);
+    // --- VERLET ROPE PHYSICS AUX CABLE ---
+    const numNodes = 16;
+    const nodes = Array.from({ length: numNodes }, (_, i) => new THREE.Vector3(0, -i * 0.12, 0));
+    const prevNodes = nodes.map((n) => n.clone());
+    let cableInitialized = false;
+
+    const rubberCableMat = new THREE.MeshStandardMaterial({
+      color: 0x141416,
+      roughness: 0.76,
+      metalness: 0.08,
+    });
+    const plugBodyMat = new THREE.MeshStandardMaterial({
+      color: 0x18181b,
+      roughness: 0.35,
+      metalness: 0.55,
+    });
+    const chromeMat = new THREE.MeshStandardMaterial({
+      color: 0xd8d8dc,
+      roughness: 0.18,
+      metalness: 0.96,
+    });
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xc8a97e,
+      roughness: 0.22,
+      metalness: 0.92,
     });
 
-    headphone.rotation.y = 0.25;
-
-    // 3D AUX Cable (world-space TubeGeometry) + 3.5mm Metal Connector
-    const numNodes = 10;
-    const cableNodes = Array.from({ length: numNodes }, (_, i) => new THREE.Vector3(0, -i * 0.15, 0));
-    const cableCurve = new THREE.CatmullRomCurve3(cableNodes);
+    const cableCurve = new THREE.CatmullRomCurve3(nodes);
     const cableMesh = new THREE.Mesh(
-      new THREE.TubeGeometry(cableCurve, 28, 0.022, 8, false),
+      new THREE.TubeGeometry(cableCurve, 36, 0.017, 10, false),
       rubberCableMat
     );
     scene.add(cableMesh);
 
+    // Detailed 3.5mm TRS Metal Connector (aligned along local -Y)
     const plugGroup = new THREE.Group();
-    const plugBody = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.12, 14), matteBlack);
-    const plugTip = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.012, 0.14, 14), champagneGold);
-    plugTip.position.y = -0.13;
-    plugGroup.add(plugBody, plugTip);
+    const strainBoot = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.026, 0.055, 14), rubberCableMat);
+    strainBoot.position.y = 0.02;
+    const gripBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.027, 0.027, 0.095, 16), plugBodyMat);
+    gripBarrel.position.y = -0.055;
+    const goldCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.024, 0.022, 16), goldMat);
+    goldCollar.position.y = -0.11;
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.011, 0.11, 14), chromeMat);
+    shaft.position.y = -0.175;
+    // Two black TRS insulator rings
+    const ring1 = new THREE.Mesh(new THREE.CylinderGeometry(0.0125, 0.0125, 0.008, 14), rubberCableMat);
+    ring1.position.y = -0.155;
+    const ring2 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.008, 14), rubberCableMat);
+    ring2.position.y = -0.19;
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.011, 12, 12), chromeMat);
+    tip.position.y = -0.232;
+
+    plugGroup.add(strainBoot, gripBarrel, goldCollar, shaft, ring1, ring2, tip);
     scene.add(plugGroup);
 
-    // Helper: Convert screen (px) to world (z = 0)
     const screenToWorld = (sx, sy) => {
       const ndcX = (sx / window.innerWidth) * 2 - 1;
       const ndcY = -(sy / window.innerHeight) * 2 + 1;
@@ -263,8 +358,8 @@ export default function Headphone3D({ lastAddedEvent }) {
     const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
     const handleMouseMove = (e) => {
       if (isTouchDevice || prefersReducedMotion) return;
-      mouse.targetX = ((e.clientX / window.innerWidth) - 0.5) * 0.35;
-      mouse.targetY = ((e.clientY / window.innerHeight) - 0.5) * 0.15;
+      mouse.targetX = ((e.clientX / window.innerWidth) - 0.5) * 0.22;
+      mouse.targetY = ((e.clientY / window.innerHeight) - 0.5) * 0.08;
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
@@ -278,95 +373,198 @@ export default function Headphone3D({ lastAddedEvent }) {
     window.addEventListener('resize', handleResize);
 
     let animId;
-    const clock = new THREE.Clock();
+    let frameCount = 0;
+    const startClock = performance.now();
+    const downAxis = new THREE.Vector3(0, -1, 0);
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
-      if (document.hidden) return;
+      if (document.hidden || !modelLoaded) return;
+      frameCount++;
 
-      const t = clock.getElapsedTime();
+      const t = (performance.now() - startClock) * 0.001;
       const anchorEl = document.getElementById('hero-headphone-anchor');
+      const act = actionRef.current;
 
+      // Keep cable active during an Add-to-Cart tap even if user scrolled down or is on /products
       if (!anchorEl) {
         pivotGroup.visible = false;
+        if (!act.active || prefersReducedMotion) {
+          cableMesh.visible = false;
+          plugGroup.visible = false;
+          return;
+        }
+      }
+
+      const rect = anchorEl ? anchorEl.getBoundingClientRect() : null;
+      const isHeroVisible = rect ? (rect.bottom > -80 && rect.top < window.innerHeight + 80) : false;
+      pivotGroup.visible = isHeroVisible;
+
+      if (!isHeroVisible && !act.active) {
         cableMesh.visible = false;
         plugGroup.visible = false;
         return;
       }
 
-      const rect = anchorEl.getBoundingClientRect();
-      const isVisible = rect.bottom > -100 && rect.top < window.innerHeight + 100;
-      pivotGroup.visible = isVisible;
-      cableMesh.visible = isVisible;
-      plugGroup.visible = isVisible;
-      if (!isVisible) return;
+      cableMesh.visible = true;
+      plugGroup.visible = true;
 
-      // Position headphone pivot at top-center of #hero-headphone-anchor
-      const anchorWorld = screenToWorld(rect.left + rect.width / 2, rect.top + rect.height * 0.22);
-      pivotGroup.position.copy(anchorWorld);
-      const scaleFactor = Math.min(Math.max(rect.width / 260, 0.65), 1.15);
-      pivotGroup.scale.setScalar(scaleFactor);
+      let anchorWorldHeight = 1.42;
+      let scaleFactor = 0.72;
+      let portWorld;
 
-      if (!prefersReducedMotion) {
-        mouse.x += (mouse.targetX - mouse.x) * 0.05;
-        mouse.y += (mouse.targetY - mouse.y) * 0.05;
-        pivotGroup.rotation.z = Math.sin(t * 1.1) * 0.03;
-        pivotGroup.rotation.y = mouse.x;
-        pivotGroup.rotation.x = mouse.y * 0.4;
+      if (rect && isHeroVisible) {
+        // Anchor top of headband right over the upper arch of 'O'
+        const anchorWorld = screenToWorld(rect.left + rect.width * 0.5, rect.top + rect.height * 0.14);
+        pivotGroup.position.copy(anchorWorld);
+
+        const anchorTopWorld = screenToWorld(rect.left, rect.top);
+        const anchorBottomWorld = screenToWorld(rect.left, rect.bottom);
+        anchorWorldHeight = Math.abs(anchorTopWorld.y - anchorBottomWorld.y);
+        scaleFactor = anchorWorldHeight / 1.42;
+        pivotGroup.scale.setScalar(scaleFactor);
+
+        let reactionTilt = 0;
+        if (act.active && !prefersReducedMotion) {
+          const elapsed = performance.now() - act.startTime;
+          reactionTilt = Math.sin(Math.min(elapsed / 1900, 1) * Math.PI * 2) * 0.032;
+        }
+
+        if (!prefersReducedMotion) {
+          mouse.x += (mouse.targetX - mouse.x) * 0.05;
+          mouse.y += (mouse.targetY - mouse.y) * 0.05;
+          pivotGroup.rotation.z = Math.sin(t * 1.05) * 0.015 + reactionTilt;
+          pivotGroup.rotation.y = mouse.x;
+          pivotGroup.rotation.x = mouse.y * 0.3;
+        }
+
+        pivotGroup.updateMatrixWorld(true);
+        portWorld = localPortOffset.clone().applyMatrix4(pivotGroup.matrixWorld);
+      } else {
+        // Off-hero fallback origin: enters gracefully from above the viewport near left column
+        const fallbackX = rect ? rect.left + rect.width * 0.25 : Math.min(window.innerWidth * 0.14, 180);
+        portWorld = screenToWorld(fallbackX, -30);
       }
 
-      // Origin of AUX cable at left earcup bottom
-      const cableOrigin = new THREE.Vector3(-0.78 * scaleFactor, -1.78 * scaleFactor, 0).add(anchorWorld);
-      let cableEnd = cableOrigin.clone().add(new THREE.Vector3(Math.sin(t * 1.3) * 0.05, -1.15 * scaleFactor, 0));
+      // Natural resting cable length (~0.95x headphone height, hanging gently in left margin)
+      const restTotalLen = Math.max(anchorWorldHeight * 0.95, 0.72);
+      let segLen = restTotalLen / (numNodes - 1);
 
-      // Handle Add-to-Cart physical tap animation (~1.8s)
-      const act = actionRef.current;
+      if (!cableInitialized) {
+        for (let i = 0; i < numNodes; i++) {
+          nodes[i].set(portWorld.x, portWorld.y - i * segLen, portWorld.z);
+          prevNodes[i].copy(nodes[i]);
+        }
+        cableInitialized = true;
+      }
+
+      // If the anchor moved (e.g. page scroll or font load), translate all rope nodes by delta
+      // so scrolling/reflow never introduces artificial lateral velocity
+      const delta = new THREE.Vector3().subVectors(portWorld, nodes[0]);
+      if (delta.lengthSq() > 0.0001) {
+        for (let i = 1; i < numNodes; i++) {
+          nodes[i].add(delta);
+          prevNodes[i].add(delta);
+        }
+      }
+
+      // Pin node 0 to earcup AUX port
+      nodes[0].copy(portWorld);
+      prevNodes[0].copy(portWorld);
+
+      // Check active Add-to-Cart tap interaction (~1.9s)
+      let targetEnd = null;
       if (act.active && !prefersReducedMotion) {
         const elapsed = performance.now() - act.startTime;
-        const total = 1800;
+        const total = 1900;
         const cartEl = document.getElementById('navbar-cart-icon');
 
         if (elapsed < total && cartEl) {
           const cRect = cartEl.getBoundingClientRect();
           const cartWorld = screenToWorld(cRect.left + cRect.width / 2, cRect.top + cRect.height / 2);
+          const distToCart = portWorld.distanceTo(cartWorld);
 
-          if (elapsed < 700) {
-            const p = 1 - Math.pow(1 - elapsed / 700, 3);
-            cableEnd.lerpVectors(cableEnd, cartWorld, p);
-          } else if (elapsed < 1050) {
-            cableEnd.copy(cartWorld);
+          if (elapsed < 750) {
+            const p = elapsed / 750;
+            const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+            const restTip = new THREE.Vector3(portWorld.x, portWorld.y - restTotalLen, portWorld.z);
+            targetEnd = new THREE.Vector3().lerpVectors(restTip, cartWorld, eased);
+            const neededLen = Math.max(restTotalLen, portWorld.distanceTo(targetEnd) * 1.12);
+            segLen = neededLen / (numNodes - 1);
+          } else if (elapsed < 1080) {
+            targetEnd = cartWorld;
+            segLen = Math.max(restTotalLen, distToCart * 1.12) / (numNodes - 1);
             if (!act.pulsed) {
               act.pulsed = true;
-              cartEl.style.transform = 'scale(1.26)';
-              setTimeout(() => {
-                if (cartEl) cartEl.style.transform = '';
-              }, 280);
+              triggerCartImpact(cartEl);
             }
           } else {
-            const p = (elapsed - 1050) / (total - 1050);
-            const eased = p * p;
-            cableEnd.lerpVectors(cartWorld, cableEnd, eased);
+            const p = (elapsed - 1080) / (total - 1080);
+            const eased = 1 - Math.pow(1 - p, 2);
+            const currentNeeded = Math.max(restTotalLen, distToCart * 1.12);
+            segLen = THREE.MathUtils.lerp(currentNeeded, restTotalLen, eased) / (numNodes - 1);
           }
         } else {
           act.active = false;
         }
       }
 
-      // Update cable nodes with natural gravity sag
-      for (let i = 0; i < numNodes; i++) {
-        const frac = i / (numNodes - 1);
-        const sag = Math.sin(frac * Math.PI) * 0.42;
-        cableNodes[i].lerpVectors(cableOrigin, cableEnd, frac);
-        cableNodes[i].y -= sag;
+      // Verlet integration step with gravity and gentle damping
+      const damping = 0.88;
+      const gravity = -0.012;
+      for (let i = 1; i < numNodes; i++) {
+        const vx = (nodes[i].x - prevNodes[i].x) * damping;
+        const vy = (nodes[i].y - prevNodes[i].y) * damping;
+        const vz = (nodes[i].z - prevNodes[i].z) * damping;
+        prevNodes[i].copy(nodes[i]);
+        // Gentle lateral restore when resting so cable hangs naturally downward
+        const idlePullX = targetEnd ? 0 : (portWorld.x - nodes[i].x) * 0.06;
+        nodes[i].x += vx + idlePullX;
+        nodes[i].y += vy + gravity;
+        nodes[i].z += vz;
       }
 
-      const updatedCurve = new THREE.CatmullRomCurve3(cableNodes);
-      cableMesh.geometry.dispose();
-      cableMesh.geometry = new THREE.TubeGeometry(updatedCurve, 28, 0.022, 8, false);
+      if (targetEnd) {
+        nodes[numNodes - 1].copy(targetEnd);
+      }
 
-      plugGroup.position.copy(cableEnd);
-      const tangent = updatedCurve.getTangent(1).normalize();
-      plugGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), tangent);
+      // Fixed-length distance constraint relaxation (prevents elastic stretching)
+      for (let iter = 0; iter < 8; iter++) {
+        nodes[0].copy(portWorld);
+        if (targetEnd) nodes[numNodes - 1].copy(targetEnd);
+
+        for (let i = 0; i < numNodes - 1; i++) {
+          const a = nodes[i];
+          const b = nodes[i + 1];
+          const diff = new THREE.Vector3().subVectors(b, a);
+          const dist = diff.length() || 0.0001;
+          const error = (dist - segLen) / dist;
+
+          if (i === 0) {
+            b.sub(diff.multiplyScalar(error));
+          } else if (i + 1 === numNodes - 1 && targetEnd) {
+            a.add(diff.multiplyScalar(error));
+          } else {
+            const half = diff.multiplyScalar(error * 0.5);
+            a.add(half);
+            b.sub(half);
+          }
+        }
+      }
+
+      // Update TubeGeometry & 3.5mm TRS Plug Orientation
+      const updatedCurve = new THREE.CatmullRomCurve3(nodes);
+      cableMesh.geometry.dispose();
+      cableMesh.geometry = new THREE.TubeGeometry(updatedCurve, 36, 0.017 * scaleFactor, 10, false);
+
+      const tipNode = nodes[numNodes - 1];
+      const prevTipNode = nodes[numNodes - 2];
+      const tangent = new THREE.Vector3().subVectors(tipNode, prevTipNode).normalize();
+      plugGroup.position.copy(tipNode);
+      plugGroup.scale.setScalar(scaleFactor);
+      if (tangent.lengthSq() > 0.001) {
+        plugGroup.quaternion.setFromUnitVectors(downAxis, tangent);
+      }
 
       renderer.render(scene, camera);
     };
@@ -377,7 +575,10 @@ export default function Headphone3D({ lastAddedEvent }) {
       cancelAnimationFrame(animId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
-      leatherTex.dispose();
+      leatherBump.dispose();
+      shadowTex.dispose();
+      envRT.dispose();
+      dracoLoader.dispose();
       cableMesh.geometry.dispose();
       if (renderer.domElement && document.body.contains(renderer.domElement)) {
         document.body.removeChild(renderer.domElement);

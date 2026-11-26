@@ -83,7 +83,7 @@ function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-[#F5F3EE]/85 dark:bg-[#0B0B0C]/85 backdrop-blur-xl border-b border-[#0B0B0C]/10 dark:border-[#F5F3EE]/10 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-16 gap-2 sm:gap-4">
 
           {/* 1. Brand Logo */}
           <Logo />
@@ -166,7 +166,7 @@ function Navbar() {
           </nav>
 
           {/* 4. Action Buttons (Theme Toggle, User Profile, Wishlist & Cart) */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-0.5 sm:gap-2 flex-shrink-0">
 
             {/* Theme Mode Switcher */}
             <button
@@ -232,10 +232,10 @@ function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#F5F3EE] text-[#0B0B0C] hover:bg-[#C8A97E] transition text-xs font-semibold uppercase tracking-wider"
+                className="flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#F5F3EE] text-[#0B0B0C] hover:bg-[#C8A97E] transition text-[11px] sm:text-xs font-semibold uppercase tracking-wider whitespace-nowrap"
               >
                 <User className="w-3.5 h-3.5" />
-                <span>Sign In</span>
+                <span className="hidden sm:inline">Sign In</span>
               </Link>
             )}
 

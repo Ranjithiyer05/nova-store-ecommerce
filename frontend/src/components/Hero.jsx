@@ -1,9 +1,6 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
-import { useCart } from '../context/CartContext';
-
-const Headphone3D = lazy(() => import('./Headphone3D'));
 
 const HERO_OBJECTS = [
   {
@@ -41,7 +38,6 @@ const HERO_OBJECTS = [
 function Hero() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0, glareX: 50, glareY: 50 });
-  const { lastAddedEvent } = useCart();
 
   const activeItem = HERO_OBJECTS[activeIdx];
 
@@ -102,26 +98,18 @@ function Hero() {
               <span>Collection 01 / Interactive Exhibition</span>
             </div>
 
-            <h1
-              className="font-serif-editorial text-5xl sm:text-6xl lg:text-[5rem] font-normal tracking-tight leading-[1.02]"
-              style={{
-                textShadow:
-                  '0 1px 0 rgba(140,109,70,0.22), 0 2px 0 rgba(140,109,70,0.14), 0 10px 24px rgba(0,0,0,0.14)',
-                transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)',
-              }}
-            >
+            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.12]">
               <span className="relative inline-block">
-                Objects
-                {/* Anchor for 3D Matte-Black Headphone hooked over "Objects" */}
-                <span
-                  id="hero-headphone-anchor"
-                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[38%] w-[210px] h-[250px] sm:w-[250px] sm:h-[290px] lg:w-[290px] lg:h-[330px] z-20"
-                  aria-hidden="true"
-                >
-                  <Suspense fallback={null}>
-                    <Headphone3D lastAddedEvent={lastAddedEvent} />
-                  </Suspense>
+                <span className="relative inline-block">
+                  O
+                  {/* Anchor for photorealistic GLTF headphone resting on the upper arch of 'O' */}
+                  <span
+                    id="hero-headphone-anchor"
+                    className="pointer-events-none absolute left-[46%] -translate-x-1/2 -top-[20%] w-[78px] h-[94px] sm:w-[92px] sm:h-[110px] lg:w-[106px] lg:h-[124px] z-20"
+                    aria-hidden="true"
+                  />
                 </span>
+                bjects
               </span>{' '}
               of{' '}
               <span className="italic text-gold-gradient">quiet</span>
