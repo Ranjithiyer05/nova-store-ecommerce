@@ -1,8 +1,6 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
-
-const Headphone3D = lazy(() => import('./Headphone3D'));
 
 const HERO_OBJECTS = [
   {
@@ -74,10 +72,6 @@ function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-[#F5F3EE] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] transition-colors duration-300">
-      {/* Photorealistic 3D headphone hanging over the 'O' with Verlet AUX cable physics */}
-      <Suspense fallback={null}>
-        <Headphone3D />
-      </Suspense>
       {/* Subtle architectural grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -104,17 +98,11 @@ function Hero() {
               <span>Collection 01 / Interactive Exhibition</span>
             </div>
 
-            <h1 className="relative font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.12]">
+            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.12]">
               Objects of{' '}
               <span className="italic text-gold-gradient">quiet</span>
               <br />
               precision.
-              {/* Invisible anchor to the right of the headline — the 3D stand & headphone are positioned here */}
-              <span
-                id="hero-headphone-anchor"
-                className="pointer-events-none absolute -right-[10px] top-[10%] w-[90px] h-[120px] sm:w-[108px] sm:h-[144px] lg:w-[128px] lg:h-[172px] z-20"
-                aria-hidden="true"
-              />
             </h1>
 
             <p className="text-sm sm:text-base leading-relaxed max-w-md text-[#0B0B0C]/65 dark:text-[#F5F3EE]/60 font-light">
