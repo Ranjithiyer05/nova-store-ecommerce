@@ -102,26 +102,32 @@ function Hero() {
               <span>Collection 01 / Interactive Exhibition</span>
             </div>
 
-            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.03]">
-              O
+            <h1
+              className="font-serif-editorial text-5xl sm:text-6xl lg:text-[5rem] font-normal tracking-tight leading-[1.02]"
+              style={{
+                textShadow:
+                  '0 1px 0 rgba(140,109,70,0.22), 0 2px 0 rgba(140,109,70,0.14), 0 10px 24px rgba(0,0,0,0.14)',
+                transform: 'perspective(900px) rotateX(4deg) rotateY(-3deg)',
+              }}
+            >
               <span className="relative inline-block">
-                b
-                {/* 3D Matte-Black Headphone suspended from the letter 'b' */}
+                Objects
+                {/* Big 3D Matte-Black Headphone wrapped around "Objects" with dangling AUX cable */}
                 <span
-                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-[12%] w-[110px] h-[135px] sm:w-[130px] sm:h-[160px] lg:w-[148px] lg:h-[180px] z-20 drop-shadow-[0_18px_24px_rgba(0,0,0,0.22)]"
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[42%] w-[210px] h-[250px] sm:w-[250px] sm:h-[290px] lg:w-[290px] lg:h-[330px] z-20 drop-shadow-[0_22px_28px_rgba(0,0,0,0.28)]"
                   aria-hidden="true"
                 >
                   <Suspense fallback={null}>
                     <Headphone3D lastAddedEvent={lastAddedEvent} />
                   </Suspense>
-                  {/* Cable origin anchor at the bottom of the left earcup */}
+                  {/* Cable origin anchor at the tip of the dangling AUX plug */}
                   <span
                     id="hero-headphone-cable-origin"
-                    className="absolute bottom-[18%] left-[22%] w-2 h-2"
+                    className="absolute bottom-[6%] left-[24%] w-2 h-2"
                   />
                 </span>
-              </span>
-              jects of{' '}
+              </span>{' '}
+              of{' '}
               <span className="italic text-gold-gradient">quiet</span>
               <br />
               precision.

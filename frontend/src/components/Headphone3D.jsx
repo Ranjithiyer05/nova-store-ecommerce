@@ -57,11 +57,14 @@ export default function Headphone3D({ lastAddedEvent }) {
   const impulseRef = useRef(0);
   const [webGLSupported] = useState(() => isWebGLAvailable());
 
-  // Trigger subtle reactive swing when an item is added to cart
+  // Trigger subtle reactive swing when an item is added to cart or AUX action fires
   useEffect(() => {
-    if (lastAddedEvent) {
+    const triggerImpulse = () => {
       impulseRef.current = 0.22;
-    }
+    };
+    if (lastAddedEvent) triggerImpulse();
+    window.addEventListener('novastore:aux-action', triggerImpulse);
+    return () => window.removeEventListener('novastore:aux-action', triggerImpulse);
   }, [lastAddedEvent]);
 
   useEffect(() => {
@@ -202,12 +205,29 @@ export default function Headphone3D({ lastAddedEvent }) {
       pad.position.x = -side * 0.095;
       cupGroup.add(pad);
 
-      // Short 3.5mm cable jack on left earcup
+      // Short 3.5mm cable jack + dangling AUX cable on left earcup
       if (side === -1) {
-        const jackGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.12, 12);
+        const jackGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.14, 12);
         const jack = new THREE.Mesh(jackGeo, champagneGold);
-        jack.position.set(0, -0.34, 0);
+        jack.position.set(0, -0.35, 0);
         cupGroup.add(jack);
+
+        // Dangling matte-black AUX cable curve
+        const cableCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, -0.42, 0),
+          new THREE.Vector3(-0.04, -0.68, 0.06),
+          new THREE.Vector3(0.03, -0.95, 0.02),
+          new THREE.Vector3(-0.01, -1.22, 0),
+        ]);
+        const cableGeo = new THREE.TubeGeometry(cableCurve, 20, 0.016, 8, false);
+        const cableMesh = new THREE.Mesh(cableGeo, matteBlack);
+        cupGroup.add(cableMesh);
+
+        // Champagne-gold 3.5mm plug tip at the end of the dangling cable
+        const plugGeo = new THREE.CylinderGeometry(0.018, 0.014, 0.11, 12);
+        const plugMesh = new THREE.Mesh(plugGeo, champagneGold);
+        plugMesh.position.set(-0.01, -1.27, 0);
+        cupGroup.add(plugMesh);
       }
 
       sideGroup.add(cupGroup);
