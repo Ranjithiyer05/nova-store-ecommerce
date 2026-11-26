@@ -112,19 +112,15 @@ function Hero() {
             >
               <span className="relative inline-block">
                 Objects
-                {/* Big 3D Matte-Black Headphone wrapped around "Objects" with dangling AUX cable */}
+                {/* Anchor for 3D Matte-Black Headphone hooked over "Objects" */}
                 <span
-                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[42%] w-[210px] h-[250px] sm:w-[250px] sm:h-[290px] lg:w-[290px] lg:h-[330px] z-20 drop-shadow-[0_22px_28px_rgba(0,0,0,0.28)]"
+                  id="hero-headphone-anchor"
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-[38%] w-[210px] h-[250px] sm:w-[250px] sm:h-[290px] lg:w-[290px] lg:h-[330px] z-20"
                   aria-hidden="true"
                 >
                   <Suspense fallback={null}>
                     <Headphone3D lastAddedEvent={lastAddedEvent} />
                   </Suspense>
-                  {/* Cable origin anchor at the tip of the dangling AUX plug */}
-                  <span
-                    id="hero-headphone-cable-origin"
-                    className="absolute bottom-[6%] left-[24%] w-2 h-2"
-                  />
                 </span>
               </span>{' '}
               of{' '}

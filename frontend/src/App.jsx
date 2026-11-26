@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import CartCableAnimation from './components/CartCableAnimation';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
@@ -19,7 +18,6 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-[#F5F3EE] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] transition-colors duration-300">
       <Navbar />
-      <CartCableAnimation />
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
