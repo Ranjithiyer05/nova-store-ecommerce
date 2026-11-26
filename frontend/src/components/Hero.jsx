@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
+import { useCart } from '../context/CartContext';
+
+const Headphone3D = lazy(() => import('./Headphone3D'));
 
 const HERO_OBJECTS = [
   {
@@ -38,6 +41,7 @@ const HERO_OBJECTS = [
 function Hero() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [tilt, setTilt] = useState({ x: 0, y: 0, glareX: 50, glareY: 50 });
+  const { lastAddedEvent } = useCart();
 
   const activeItem = HERO_OBJECTS[activeIdx];
 
@@ -99,7 +103,25 @@ function Hero() {
             </div>
 
             <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.03]">
-              Objects of{' '}
+              O
+              <span className="relative inline-block">
+                b
+                {/* 3D Matte-Black Headphone suspended from the letter 'b' */}
+                <span
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-[12%] w-[110px] h-[135px] sm:w-[130px] sm:h-[160px] lg:w-[148px] lg:h-[180px] z-20 drop-shadow-[0_18px_24px_rgba(0,0,0,0.22)]"
+                  aria-hidden="true"
+                >
+                  <Suspense fallback={null}>
+                    <Headphone3D lastAddedEvent={lastAddedEvent} />
+                  </Suspense>
+                  {/* Cable origin anchor at the bottom of the left earcup */}
+                  <span
+                    id="hero-headphone-cable-origin"
+                    className="absolute bottom-[18%] left-[22%] w-2 h-2"
+                  />
+                </span>
+              </span>
+              jects of{' '}
               <span className="italic text-gold-gradient">quiet</span>
               <br />
               precision.

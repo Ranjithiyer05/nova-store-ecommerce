@@ -69,8 +69,13 @@ export function CartProvider({ children }) {
     return wishlistItems.some((item) => item._id === productId);
   };
 
+  // Track successful add-to-cart events for signature cable & cart pulse animations
+  const [lastAddedEvent, setLastAddedEvent] = useState(null);
+
   // 2. Add item to cart
   const addToCart = (product, qty = 1) => {
+    if (!product || product.countInStock <= 0) return;
+
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item._id === product._id);
 
@@ -100,6 +105,8 @@ export function CartProvider({ children }) {
         ];
       }
     });
+
+    setLastAddedEvent({ id: Date.now() + Math.random(), productId: product._id });
   };
 
   // 3. Update quantity of existing item
@@ -164,6 +171,7 @@ export function CartProvider({ children }) {
         wishlistItems,
         toggleWishlist,
         isInWishlist,
+        lastAddedEvent,
       }}
     >
       {children}

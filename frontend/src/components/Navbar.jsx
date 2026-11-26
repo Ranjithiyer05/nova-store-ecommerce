@@ -255,8 +255,9 @@ function Navbar() {
 
             {/* Shopping Cart Button */}
             <Link
+              id="navbar-cart-icon"
               to="/cart"
-              className="relative p-2 text-[#0B0B0C]/75 dark:text-[#F5F3EE]/70 hover:text-[#8C6D46] dark:hover:text-[#C8A97E] hover:bg-[#0B0B0C]/5 dark:hover:bg-[#F5F3EE]/5 rounded-full transition flex items-center justify-center"
+              className="relative p-2 text-[#0B0B0C]/75 dark:text-[#F5F3EE]/70 hover:text-[#8C6D46] dark:hover:text-[#C8A97E] hover:bg-[#0B0B0C]/5 dark:hover:bg-[#F5F3EE]/5 rounded-full transition-transform duration-300 flex items-center justify-center"
               title="Shopping Cart"
             >
               <ShoppingCart className="w-5 h-5" />
