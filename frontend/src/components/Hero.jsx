@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
+
+const Headphone3D = lazy(() => import('./Headphone3D'));
 
 const HERO_OBJECTS = [
   {
@@ -72,6 +74,10 @@ function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-[#F5F3EE] dark:bg-[#0B0B0C] text-[#0B0B0C] dark:text-[#F5F3EE] transition-colors duration-300">
+      {/* Photorealistic 3D headphone hanging over the 'O' with Verlet AUX cable physics */}
+      <Suspense fallback={null}>
+        <Headphone3D />
+      </Suspense>
       {/* Subtle architectural grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
