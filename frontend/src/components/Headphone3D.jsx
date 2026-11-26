@@ -405,6 +405,11 @@ export default function Headphone3D() {
     const startClock = performance.now();
     const downAxis = new THREE.Vector3(0, -1, 0);
 
+    // Smoothed stand position/scale — lerped each frame to eliminate scroll jitter
+    const smoothStandPos = new THREE.Vector3();
+    let smoothScale = 0.6;
+    let standInitialized = false;
+
     const animate = () => {
       animId = requestAnimationFrame(animate);
       if (document.hidden || !modelLoaded) return;
@@ -446,8 +451,14 @@ export default function Headphone3D() {
       const anchorWorldH = Math.abs(anchorTopW.y - anchorBotW.y);
       const scaleFactor = Math.max(anchorWorldH / 1.1, 0.4);
 
-      standGroup.position.copy(standWorld);
-      standGroup.scale.setScalar(scaleFactor);
+      // ── Smooth the stand position/scale to eliminate scroll jitter ──
+      // On first frame snap immediately; afterwards lerp at 8% per frame for a silky follow.
+      const lerpSpeed = standInitialized ? 0.08 : 1.0;
+      standInitialized = true;
+      smoothStandPos.lerp(standWorld, lerpSpeed);
+      smoothScale += (scaleFactor - smoothScale) * lerpSpeed;
+      standGroup.position.copy(smoothStandPos);
+      standGroup.scale.setScalar(smoothScale);
 
       // Subtle idle sway
       let reactionTilt = 0;
