@@ -121,9 +121,12 @@ function ProductDetailsPage() {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
     if (product.countInStock === 0) return;
-    addToCart(product, quantity);
+    const rect = e?.currentTarget?.getBoundingClientRect();
+    const targetX = rect ? rect.left + rect.width / 2 : null;
+    const targetY = rect ? rect.top + rect.height / 2 : null;
+    addToCart(product, quantity, { targetX, targetY });
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
   };
