@@ -152,6 +152,7 @@ export default function Headphone3D() {
   const { lastAddedEvent } = useCart();
   const [webGLSupported] = useState(() => isWebGLAvailable());
   const actionRef = useRef({ active: false, startTime: 0, pulsed: false, targetX: 0, targetY: 0 });
+  const cableResetRef = useRef(0); // incremented each trigger so cable resets
 
   useEffect(() => {
     if (!lastAddedEvent) return;
@@ -162,6 +163,7 @@ export default function Headphone3D() {
       targetX: lastAddedEvent.targetX ?? window.innerWidth / 2,
       targetY: lastAddedEvent.targetY ?? window.innerHeight * 0.72,
     };
+    cableResetRef.current += 1; // signal animate loop to reset cable nodes
   }, [lastAddedEvent]);
 
   useEffect(() => {
@@ -323,7 +325,8 @@ export default function Headphone3D() {
     const numNodes = 20;
     const nodes = Array.from({ length: numNodes }, (_, i) => new THREE.Vector3(0, -i * 0.1, 0));
     const prevNodes = nodes.map((n) => n.clone());
-    let cableInitialized = false;
+    // Use the shared ref so the lastAddedEvent effect can reset it
+    let lastResetSeen = cableResetRef.current;
 
     const rubberCableMat = new THREE.MeshStandardMaterial({
       color: 0x141416,
@@ -405,10 +408,15 @@ export default function Headphone3D() {
     const startClock = performance.now();
     const downAxis = new THREE.Vector3(0, -1, 0);
 
-    // Smoothed stand position/scale — lerped each frame to eliminate scroll jitter
-    const smoothStandPos = new THREE.Vector3();
-    let smoothScale = 0.6;
-    let standInitialized = false;
+    // ── FIXED POSITION STRATEGY ──────────────────────────────────────────────
+    // We compute the stand world-position ONCE (the very first frame the hero
+    // anchor is on-screen) and never change it again.  This makes the stand
+    // feel like a physical object sitting in the scene rather than a floating
+    // overlay that chases the DOM element while scrolling.
+    let fixedStandPos = null;      // THREE.Vector3 — set once
+    let fixedScale = null;         // number — set once
+    let fixedPortWorld = null;     // world-space AUX port — updated when stand is visible
+    let fixedRestLen = 0.9;        // cable rest length — set once
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -426,41 +434,31 @@ export default function Headphone3D() {
       }
 
       const rect = anchorEl.getBoundingClientRect();
-      const isHeroVisible = rect.bottom > -120 && rect.top < window.innerHeight + 120;
-      standGroup.visible = isHeroVisible;
+      // Hero is "in view" when the anchor element is within the viewport
+      const isHeroVisible = rect.top >= -60 && rect.bottom <= window.innerHeight + 60;
 
-      if (!isHeroVisible && !act.active) {
-        cableMesh.visible = false;
-        plugGroup.visible = false;
-        return;
+      // ── Lock stand position on first visible frame ──────────────────────────
+      if (isHeroVisible && !fixedStandPos) {
+        const anchorCX = rect.left + rect.width * 0.5;
+        const anchorCY = rect.top + rect.height * 0.08;
+        fixedStandPos = screenToWorld(anchorCX, anchorCY);
+
+        const anchorTopW = screenToWorld(rect.left, rect.top);
+        const anchorBotW = screenToWorld(rect.left, rect.bottom);
+        const anchorWorldH = Math.abs(anchorTopW.y - anchorBotW.y);
+        fixedScale = Math.max(anchorWorldH / 1.1, 0.4);
+        fixedRestLen = Math.max(anchorWorldH * 1.6, 0.9);
+
+        // Apply fixed position & scale immediately (never touched again)
+        standGroup.position.copy(fixedStandPos);
+        standGroup.scale.setScalar(fixedScale);
       }
 
-      cableMesh.visible = true;
-      plugGroup.visible = true;
+      // Stand is only visible while the hero is in the viewport — it stays
+      // at its locked world position, it does NOT follow the scroll.
+      standGroup.visible = isHeroVisible && !!fixedStandPos;
 
-      // ── Position the stand so its hook tip aligns with top-centre of anchor ──
-      // The anchor is a small invisible span sitting to the right of the hero headline.
-      // We place the stand's origin (hook-tip at y=0) at that world point.
-      const anchorCenterX = rect.left + rect.width * 0.5;
-      const anchorCenterY = rect.top + rect.height * 0.08;
-      const standWorld = screenToWorld(anchorCenterX, anchorCenterY);
-
-      // Scale stand proportionally to anchor element size
-      const anchorTopW = screenToWorld(rect.left, rect.top);
-      const anchorBotW = screenToWorld(rect.left, rect.bottom);
-      const anchorWorldH = Math.abs(anchorTopW.y - anchorBotW.y);
-      const scaleFactor = Math.max(anchorWorldH / 1.1, 0.4);
-
-      // ── Smooth the stand position/scale to eliminate scroll jitter ──
-      // On first frame snap immediately; afterwards lerp at 8% per frame for a silky follow.
-      const lerpSpeed = standInitialized ? 0.08 : 1.0;
-      standInitialized = true;
-      smoothStandPos.lerp(standWorld, lerpSpeed);
-      smoothScale += (scaleFactor - smoothScale) * lerpSpeed;
-      standGroup.position.copy(smoothStandPos);
-      standGroup.scale.setScalar(smoothScale);
-
-      // Subtle idle sway
+      // Idle sway (rotation only, not position)
       let reactionTilt = 0;
       if (act.active && !prefersReducedMotion) {
         const elapsed = performance.now() - act.startTime;
@@ -474,32 +472,44 @@ export default function Headphone3D() {
         standGroup.rotation.x = mouse.y * 0.25;
       }
 
-      standGroup.updateMatrixWorld(true);
+      // Update port world position only while stand is visible
+      if (isHeroVisible && fixedStandPos) {
+        standGroup.updateMatrixWorld(true);
+        fixedPortWorld = localPortOffset.clone().applyMatrix4(pivotGroup.matrixWorld);
+      }
 
-      // AUX cable port in world space
-      const portWorld = localPortOffset.clone().applyMatrix4(pivotGroup.matrixWorld);
+      // If we have never seen the hero yet, nothing to draw
+      if (!fixedPortWorld) {
+        cableMesh.visible = false;
+        plugGroup.visible = false;
+        return;
+      }
 
-      // Cable resting total length (hang down naturally from earcup)
-      const restTotalLen = anchorWorldH * 1.6;
+      // Cable is only visible during an active Add-to-Cart animation
+      const showCable = act.active && !prefersReducedMotion;
+      cableMesh.visible = showCable;
+      plugGroup.visible = showCable;
+
+      if (!showCable) {
+        renderer.render(scene, camera);
+        return;
+      }
+
+      const portWorld = fixedPortWorld;
+      const restTotalLen = fixedRestLen;
       let segLen = restTotalLen / (numNodes - 1);
 
-      if (!cableInitialized) {
+      // Reset cable nodes to a straight hang from the port on first use or on each new trigger
+      if (!cableInitialized || cableResetRef.current !== lastResetSeen) {
+        lastResetSeen = cableResetRef.current;
+        cableInitialized = true;
         for (let i = 0; i < numNodes; i++) {
           nodes[i].set(portWorld.x, portWorld.y - i * segLen, portWorld.z);
           prevNodes[i].copy(nodes[i]);
         }
-        cableInitialized = true;
       }
 
-      // Translate all rope nodes when anchor moves (scroll/reflow)
-      const delta = new THREE.Vector3().subVectors(portWorld, nodes[0]);
-      if (delta.lengthSq() > 0.0001) {
-        for (let i = 1; i < numNodes; i++) {
-          nodes[i].add(delta);
-          prevNodes[i].add(delta);
-        }
-      }
-
+      // Pin node 0 to earcup port every frame
       nodes[0].copy(portWorld);
       prevNodes[0].copy(portWorld);
 
