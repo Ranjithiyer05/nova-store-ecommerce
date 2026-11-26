@@ -26,7 +26,12 @@ function ProductCard({ product }) {
   const handleAddToCart = (e) => {
     e.preventDefault();
     if (product.countInStock === 0) return;
-    addToCart(product, 1);
+    // Capture this button's screen position so the AUX cable can target it
+    const rect = e.currentTarget.getBoundingClientRect();
+    addToCart(product, 1, {
+      targetX: rect.left + rect.width / 2,
+      targetY: rect.top + rect.height / 2,
+    });
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1800);
   };

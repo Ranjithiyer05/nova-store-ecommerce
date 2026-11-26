@@ -73,7 +73,7 @@ export function CartProvider({ children }) {
   const [lastAddedEvent, setLastAddedEvent] = useState(null);
 
   // 2. Add item to cart
-  const addToCart = (product, qty = 1) => {
+  const addToCart = (product, qty = 1, buttonPos = null) => {
     if (!product || product.countInStock <= 0) return;
 
     setCartItems((prevItems) => {
@@ -106,7 +106,7 @@ export function CartProvider({ children }) {
       }
     });
 
-    setLastAddedEvent({ id: Date.now() + Math.random(), productId: product._id });
+    setLastAddedEvent({ id: Date.now() + Math.random(), productId: product._id, targetX: buttonPos?.targetX ?? null, targetY: buttonPos?.targetY ?? null });
   };
 
   // 3. Update quantity of existing item

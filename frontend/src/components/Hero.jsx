@@ -104,23 +104,17 @@ function Hero() {
               <span>Collection 01 / Interactive Exhibition</span>
             </div>
 
-            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.12]">
-              <span className="relative inline-block">
-                <span className="relative inline-block">
-                  O
-                  {/* Anchor for photorealistic GLTF headphone resting on the upper arch of 'O' */}
-                  <span
-                    id="hero-headphone-anchor"
-                    className="pointer-events-none absolute left-[46%] -translate-x-1/2 -top-[20%] w-[78px] h-[94px] sm:w-[92px] sm:h-[110px] lg:w-[106px] lg:h-[124px] z-20"
-                    aria-hidden="true"
-                  />
-                </span>
-                bjects
-              </span>{' '}
-              of{' '}
+            <h1 className="relative font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.12]">
+              Objects of{' '}
               <span className="italic text-gold-gradient">quiet</span>
               <br />
               precision.
+              {/* Invisible anchor to the right of the headline — the 3D stand & headphone are positioned here */}
+              <span
+                id="hero-headphone-anchor"
+                className="pointer-events-none absolute -right-[10px] top-[10%] w-[90px] h-[120px] sm:w-[108px] sm:h-[144px] lg:w-[128px] lg:h-[172px] z-20"
+                aria-hidden="true"
+              />
             </h1>
 
             <p className="text-sm sm:text-base leading-relaxed max-w-md text-[#0B0B0C]/65 dark:text-[#F5F3EE]/60 font-light">
