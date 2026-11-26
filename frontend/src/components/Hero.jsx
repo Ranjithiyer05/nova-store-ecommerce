@@ -102,8 +102,26 @@ function Hero() {
               <span>Collection 01 / Interactive Exhibition</span>
             </div>
 
-            <h1 className="font-serif-editorial text-6xl sm:text-7xl lg:text-[5.25rem] font-normal tracking-tight leading-[1.01]">
-              Objects of{' '}
+            <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.03]">
+              O
+              <span className="relative inline-block">
+                b
+                {/* 3D Matte-Black Headphone suspended from the letter 'b' */}
+                <span
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-[12%] w-[110px] h-[135px] sm:w-[130px] sm:h-[160px] lg:w-[148px] lg:h-[180px] z-20 drop-shadow-[0_18px_24px_rgba(0,0,0,0.22)]"
+                  aria-hidden="true"
+                >
+                  <Suspense fallback={null}>
+                    <Headphone3D lastAddedEvent={lastAddedEvent} />
+                  </Suspense>
+                  {/* Cable origin anchor at the bottom of the left earcup */}
+                  <span
+                    id="hero-headphone-cable-origin"
+                    className="absolute bottom-[18%] left-[22%] w-2 h-2"
+                  />
+                </span>
+              </span>
+              jects of{' '}
               <span className="italic text-gold-gradient">quiet</span>
               <br />
               precision.
@@ -188,27 +206,14 @@ function Hero() {
                   }}
                 />
 
-                <div className="relative h-[380px] sm:h-[440px] w-full rounded-2xl overflow-hidden bg-gradient-to-b from-[#F5F3EE] to-[#EAE5DC] dark:from-[#18181B] dark:to-[#101012]">
-                  {activeIdx === 0 ? (
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      <Suspense fallback={null}>
-                        <Headphone3D lastAddedEvent={lastAddedEvent} />
-                      </Suspense>
-                      {/* AUX Cable origin anchor at the bottom of the left earcup */}
-                      <span
-                        id="hero-headphone-cable-origin"
-                        className="absolute bottom-[28%] left-[38%] w-2 h-2 pointer-events-none"
-                      />
-                    </div>
-                  ) : (
-                    <img
-                      key={activeItem.image}
-                      src={activeItem.image}
-                      alt={activeItem.name}
-                      className="w-full h-full object-cover object-center transition-all duration-700 scale-105"
-                    />
-                  )}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B0B0C]/75 via-transparent to-transparent" />
+                <div className="relative h-[380px] sm:h-[420px] w-full rounded-2xl overflow-hidden bg-[#1C1C1F]">
+                  <img
+                    key={activeItem.image}
+                    src={activeItem.image}
+                    alt={activeItem.name}
+                    className="w-full h-full object-cover object-center transition-all duration-700 scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C]/80 via-transparent to-transparent" />
 
                   <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full glass-editorial text-[10px] uppercase tracking-widest text-[#F5F3EE]">
                     <Sparkles className="w-3 h-3 text-[#C8A97E]" />
